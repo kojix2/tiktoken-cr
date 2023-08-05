@@ -2,7 +2,7 @@
 name = "tiktoken_crystal"
 version = "0.1.0"
 edition = "2021"
-authors = ["IAPark <isaac.a.park@gmail.com>"]
+authors = ["kojix2 <2xijok@gmail.com>"]
 license = "MIT"
 publish = false
 
@@ -11,4 +11,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 magnus = { version = "0.4" }
-tiktoken-rs = { git = "https://github.com/IAPark/tiktoken-rs.git" }
+tiktoken-rs = { git = "https://github.com/zurawiki/tiktoken-rs" }
