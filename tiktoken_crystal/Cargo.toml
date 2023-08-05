@@ -1,5 +1,5 @@
 [package]
-name = "tiktoken_ruby"
+name = "tiktoken_crystal"
 version = "0.1.0"
 edition = "2021"
 authors = ["IAPark <isaac.a.park@gmail.com>"]

@@ -1,2 +1,2 @@
 *.lock
-target
+tiktoken_crystal/target
