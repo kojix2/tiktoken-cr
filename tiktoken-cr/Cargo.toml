@@ -1,5 +1,5 @@
 [package]
-name = "tiktoken_crystal"
+name = "tiktoken-cr"
 version = "0.1.0"
 edition = "2021"
 authors = ["kojix2 <2xijok@gmail.com>"]
