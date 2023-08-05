@@ -1,0 +1,14 @@
+name: tiktoken
+version: 0.1.0
+
+authors:
+  - kojix2 <2xijok@gmail.com>
+
+description: |
+  Crystal wrapper for TikToken
+
+# development_dependencies:
+#   webmock:
+#     github: manastech/webmock.cr
+
+license: MIT
