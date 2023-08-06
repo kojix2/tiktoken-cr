@@ -38,17 +38,14 @@ describe "Tiktoken::LibTiktoken" do
           function_call: nil
         ),
         Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
-          role: "system",
+          role: "assistant",
           name: nil,
           content: "Parlez-vous francais?",
           function_call: nil
         ),
       ]
-      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(3)
-      messages[0] = message_array[0]
-      messages[1] = message_array[1]
-      messages[2] = message_array[2]
-      Tiktoken::LibTiktoken.get_chat_completion_max_tokens_raw(model, 3, messages).should eq 8156
+      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
+      Tiktoken::LibTiktoken.num_tokens_from_messages_raw(model, message_array.size, messages).should eq 36
     end
   end
 
@@ -64,6 +61,32 @@ describe "Tiktoken::LibTiktoken" do
       messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(1)
       messages[0] = message
       Tiktoken::LibTiktoken.get_chat_completion_max_tokens_raw(model, 1, messages).should eq 4078
+    end
+  
+    it "returns the number of tokens in a given messages" do
+      model = "gpt-4"
+      message_array = [
+        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+          role: "system",
+          name: nil,
+          content: "You are a helpful assistant that only speaks French.",
+          function_call: nil
+        ),
+        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+          role: "user",
+          name: nil,
+          content: "Hello, how are you?",
+          function_call: nil
+        ),
+        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+          role: "assistant",
+          name: nil,
+          content: "Parlez-vous francais?",
+          function_call: nil
+        ),
+      ]
+      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
+      Tiktoken::LibTiktoken.get_chat_completion_max_tokens_raw(model, message_array.size, messages).should eq 8156
     end
   end
 end
