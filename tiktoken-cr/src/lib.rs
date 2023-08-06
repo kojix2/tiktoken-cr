@@ -2,6 +2,40 @@ use std::convert::TryInto;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use tiktoken_rs;
+use tiktoken_rs::CoreBPE;
+
+#[no_mangle]
+pub extern "C" fn r50k_base_raw() -> *mut CoreBPE {
+    let bpe = tiktoken_rs::r50k_base();
+    let corebpe = bpe.unwrap();
+    let boxed = Box::new(corebpe);
+    Box::into_raw(boxed)
+}
+
+#[no_mangle]
+pub extern "C" fn p50k_base_raw() -> *mut CoreBPE {
+    let bpe = tiktoken_rs::p50k_base();
+    let corebpe = bpe.unwrap();
+    let boxed = Box::new(corebpe);
+    Box::into_raw(boxed)
+}
+
+#[no_mangle]
+pub extern "C" fn p50k_edit_raw() -> *mut CoreBPE {
+    let bpe = tiktoken_rs::p50k_edit();
+    let corebpe = bpe.unwrap();
+    let boxed = Box::new(corebpe);
+    Box::into_raw(boxed)
+}
+
+#[no_mangle]
+pub extern "C" fn cl100k_base_raw() -> *mut CoreBPE {
+    let bpe = tiktoken_rs::cl100k_base();
+    let corebpe = bpe.unwrap();
+    let boxed = Box::new(corebpe);
+    Box::into_raw(boxed)
+}
+
 
 #[repr(C)]
 pub struct FunctionCall2 {
