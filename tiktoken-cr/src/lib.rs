@@ -14,7 +14,7 @@ pub struct ChatCompletionRequestMessage2 {
     pub role: *const c_char,
     pub content: *const c_char,
     pub name: *const c_char,
-    pub function_call: FunctionCall2,
+    pub function_call: *const FunctionCall2,
 }
 
 fn get_string_from_c_char(ptr: *const c_char) -> Result<String, std::str::Utf8Error> {
@@ -118,17 +118,23 @@ pub extern "C" fn num_tokens_from_messages_raw(
             let role = c_str_to_string(message.role.clone()).unwrap_or_default();
             let content = c_str_to_string(message.content.clone());
             let name = c_str_to_string(message.name.clone());
-            let fun_name = c_str_to_string(message.function_call.name.clone()).unwrap_or_default();
-            let fun_args =
-                c_str_to_string(message.function_call.arguments.clone()).unwrap_or_default();
+            let function_call = if !message.function_call.is_null() {
+                let fun_call = message.function_call;
+                let fun_name = c_str_to_string((*fun_call).name).unwrap_or_default();
+                let fun_args =
+                    c_str_to_string((*fun_call).arguments).unwrap_or_default();
+                Some(tiktoken_rs::FunctionCall {
+                    name: fun_name,
+                    arguments: fun_args,
+                })
+            } else {
+                None
+            };
             messages_vec.push(tiktoken_rs::ChatCompletionRequestMessage {
                 role: role,
                 content: content,
                 name: name,
-                function_call: Some(tiktoken_rs::FunctionCall {
-                    name: fun_name,
-                    arguments: fun_args,
-                }),
+                function_call: function_call,
             });
         }
         messages_vec
@@ -179,17 +185,23 @@ pub extern "C" fn get_chat_completion_max_tokens_raw(
             let role = c_str_to_string(message.role.clone()).unwrap_or_default();
             let content = c_str_to_string(message.content.clone());
             let name = c_str_to_string(message.name.clone());
-            let fun_name = c_str_to_string(message.function_call.name.clone()).unwrap_or_default();
-            let fun_args =
-                c_str_to_string(message.function_call.arguments.clone()).unwrap_or_default();
+            let function_call = if !message.function_call.is_null() {
+                let fun_call = message.function_call;
+                let fun_name = c_str_to_string((*fun_call).name).unwrap_or_default();
+                let fun_args =
+                    c_str_to_string((*fun_call).arguments).unwrap_or_default();
+                Some(tiktoken_rs::FunctionCall {
+                    name: fun_name,
+                    arguments: fun_args,
+                })
+            } else {
+                None
+            };
             messages_vec.push(tiktoken_rs::ChatCompletionRequestMessage {
                 role: role,
                 content: content,
                 name: name,
-                function_call: Some(tiktoken_rs::FunctionCall {
-                    name: fun_name,
-                    arguments: fun_args,
-                }),
+                function_call: function_call,
             });
         }
         messages_vec
