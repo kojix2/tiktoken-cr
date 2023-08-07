@@ -121,4 +121,15 @@ describe "Tiktoken::LibTiktoken" do
       Tiktoken::LibTiktoken.get_chat_completion_max_tokens_raw(model, message_array.size, messages).should eq 8156
     end
   end
+
+  describe "#corebpe_encode_ordinary_raw" do
+    it "returns a pointer to a CoreBPEEncodedString" do
+      corebpe = Tiktoken::LibTiktoken.r50k_base_raw
+      string = "dog dog dog cat"
+      num_tokens = Pointer(UInt32).malloc(1)
+      arr_ptr = Tiktoken::LibTiktoken.corebpe_encode_ordinary_raw(corebpe, string, num_tokens)
+      n = num_tokens[0]
+      p Array.new(n) { |i| arr_ptr[i] }
+    end
+  end
 end

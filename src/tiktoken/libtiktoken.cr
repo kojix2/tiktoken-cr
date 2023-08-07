@@ -22,6 +22,6 @@ module Tiktoken
     fun num_tokens_from_messages_raw(model : LibC::Char*, num_messages : UInt32, messages : ChatCompletionRequestMessage*) : Int32
     fun get_chat_completion_max_tokens_raw(model : LibC::Char*, num_messages : UInt32, messages : ChatCompletionRequestMessage*) : Int32
     fun get_bpe_from_model_raw(model : LibC::Char*) : Void*
-    fun corebpe_encode_ordinary_raw(corebpe : Void*, text : LibC::Char*, num_tokens : UInt32) : LibC::SizeT*
+    fun corebpe_encode_ordinary_raw(corebpe : Void*, text : LibC::Char*, num_tokens : UInt32*) : UInt64*
   end
 end
