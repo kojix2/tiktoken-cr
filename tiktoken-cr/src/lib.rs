@@ -377,7 +377,7 @@ pub extern "C" fn corebpe_encode_with_special_tokens_raw(
 pub extern "C" fn corebpe_decode_raw(
     ptr: *mut CoreBPE,
     tokens: *const u64,
-    len: *mut u32,
+    num_tokens: u32,
 ) -> *mut c_char {
     if ptr.is_null() {
         eprintln!("Null pointer provided!");
@@ -387,11 +387,7 @@ pub extern "C" fn corebpe_decode_raw(
         eprintln!("Null pointer provided!");
         return std::ptr::null_mut();
     }
-    if len.is_null() {
-        eprintln!("Null pointer provided!");
-        return std::ptr::null_mut();
-    }
-    let tokens = unsafe { std::slice::from_raw_parts(tokens, *len as usize) };
+    let tokens = unsafe { std::slice::from_raw_parts(tokens, num_tokens as usize) };
     let tokens: Vec<usize> = tokens.iter().map(|&x| x as usize).collect();
 
     let corebpe = unsafe { &mut *ptr };
@@ -403,7 +399,6 @@ pub extern "C" fn corebpe_decode_raw(
             return std::ptr::null_mut();
         }
     };
-    unsafe { *len = decoded.len() as u32 }; // FIXME ?
     let c_str = match std::ffi::CString::new(decoded) {
         Ok(c_str) => c_str,
         Err(_) => {

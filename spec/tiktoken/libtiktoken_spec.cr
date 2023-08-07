@@ -125,14 +125,20 @@ describe "Tiktoken::LibTiktoken" do
   describe "#corebpe_encode_ordinary_raw" do
     it "returns a pointer to a CoreBPEEncodedString" do
       corebpe = Tiktoken::LibTiktoken.r50k_base_raw
-      string = "dog dog dog cat"
-      num_tokens = Pointer(UInt32).malloc(1)
-      arr_ptr = Tiktoken::LibTiktoken.corebpe_encode_ordinary_raw(corebpe, string, num_tokens)
-      n = num_tokens[0]
-      p Array.new(n) { |i| arr_ptr[i] }
-      s = Tiktoken::LibTiktoken.corebpe_decode_raw(corebpe, arr_ptr, num_tokens)
-      p String.new(s)
-      Tiktoken::LibTiktoken.destroy_corebpe_encoded_string_raw(arr_ptr)
+      string = "This is a very beautiful day."
+      num_tokens1 = Pointer(UInt32).malloc(1)
+      num_tokens2 = Pointer(UInt32).malloc(1)
+      arr_ptr1 = Tiktoken::LibTiktoken.corebpe_encode_ordinary_raw(corebpe, string, num_tokens1)
+      arr_ptr2 = Tiktoken::LibTiktoken.corebpe_encode_with_special_tokens_raw(corebpe, string, num_tokens2)
+      n1 = num_tokens1[0]
+      n2 = num_tokens2[0]
+      p Array.new(n1) { |i| arr_ptr1[i] }
+      p Array.new(n2) { |i| arr_ptr2[i] }
+      s1 = Tiktoken::LibTiktoken.corebpe_decode_raw(corebpe, arr_ptr1, n1)
+      s2 = Tiktoken::LibTiktoken.corebpe_decode_raw(corebpe, arr_ptr2, n2)
+      p String.new(s1)
+      p String.new(s2)
+      Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
     end
   end
 end

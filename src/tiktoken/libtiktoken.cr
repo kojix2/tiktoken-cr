@@ -24,6 +24,6 @@ module Tiktoken
     fun get_bpe_from_model_raw(model : LibC::Char*) : Void*
     fun corebpe_encode_ordinary_raw(corebpe : Void*, text : LibC::Char*, num_tokens : UInt32*) : UInt64*
     fun corebpe_encode_with_special_tokens_raw(corebpe : Void*, text : LibC::Char*, num_tokens : UInt32*) : UInt64*
-    fun corebpe_decode_raw(corebpe : Void*, tokens : UInt64*, len : UInt32*) : LibC::Char*
+    fun corebpe_decode_raw(corebpe : Void*, tokens : UInt64*, num_tokens : UInt32) : LibC::Char*
   end
 end
