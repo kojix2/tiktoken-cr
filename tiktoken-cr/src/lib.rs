@@ -164,8 +164,7 @@ pub extern "C" fn num_tokens_from_messages_raw(
             let function_call = if !message.function_call.is_null() {
                 let fun_call = message.function_call;
                 let fun_name = c_str_to_string((*fun_call).name).unwrap_or_default();
-                let fun_args =
-                    c_str_to_string((*fun_call).arguments).unwrap_or_default();
+                let fun_args = c_str_to_string((*fun_call).arguments).unwrap_or_default();
                 Some(tiktoken_rs::FunctionCall {
                     name: fun_name,
                     arguments: fun_args,
@@ -231,8 +230,7 @@ pub extern "C" fn get_chat_completion_max_tokens_raw(
             let function_call = if !message.function_call.is_null() {
                 let fun_call = message.function_call;
                 let fun_name = c_str_to_string((*fun_call).name).unwrap_or_default();
-                let fun_args =
-                    c_str_to_string((*fun_call).arguments).unwrap_or_default();
+                let fun_args = c_str_to_string((*fun_call).arguments).unwrap_or_default();
                 Some(tiktoken_rs::FunctionCall {
                     name: fun_name,
                     arguments: fun_args,
@@ -260,6 +258,85 @@ pub extern "C" fn get_chat_completion_max_tokens_raw(
         Err(_) => {
             eprintln!("Failed to get max tokens!");
             return -4;
+        }
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn get_bpe_from_model_raw(model: *const c_char) -> *mut CoreBPE {
+    if model.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    let model = unsafe {
+        let raw = CStr::from_ptr(model);
+        match raw.to_str() {
+            Ok(valid_str) => valid_str,
+            Err(_) => {
+                eprintln!("Invalid UTF-8 sequence provided!");
+                return std::ptr::null_mut();
+            }
+        }
+    };
+    let bpe = tiktoken_rs::get_bpe_from_model(model);
+    match bpe {
+        Ok(bpe) => {
+            let boxed = Box::new(bpe);
+            Box::into_raw(boxed)
+        }
+        Err(_) => {
+            eprintln!("Failed to get BPE from model!");
+            std::ptr::null_mut()
+        }
+    }
+}
+
+//
+
+#[no_mangle]
+pub extern "C" fn corebpe_encode_ordinary_raw(
+    ptr: *mut CoreBPE,
+    text: *const c_char,
+    num_tokens: *mut u32,
+) -> *mut c_size_t {
+    if ptr.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if text.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if num_tokens.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    let text = unsafe {
+        let raw = CStr::from_ptr(text);
+        match raw.to_str() {
+            Ok(valid_str) => valid_str,
+            Err(_) => {
+                eprintln!("Invalid UTF-8 sequence provided!");
+                return std::ptr::null_mut();
+            }
+        }
+    };
+    let mut num_tokens = unsafe { *num_tokens };
+    let corebpe = unsafe { &mut *ptr };
+    let encoded = corebpe.encode_ordinary(text);
+    match encoded {
+        Ok(encoded) => {
+            let encoded = encoded
+                .into_iter()
+                .map(|x| x as c_size_t)
+                .collect::<Vec<_>>();
+            num_tokens = encoded.len() as u32;
+            let boxed = encoded.into_boxed_slice();
+            Box::into_raw(boxed)
+        }
+        Err(_) => {
+            eprintln!("Failed to encode text!");
+            std::ptr::null_mut()
         }
     }
 }

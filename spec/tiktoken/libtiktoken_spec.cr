@@ -7,7 +7,7 @@ describe "Tiktoken::LibTiktoken" do
       Tiktoken::LibTiktoken.get_completion_max_tokens_raw("gpt-4", "I am a tanuki.").should eq 8186
     end
   end
-  
+
   describe "#r50k_base" do
     it "returns CoreBPE" do
       corebpe = Tiktoken::LibTiktoken.r50k_base_raw
@@ -94,7 +94,7 @@ describe "Tiktoken::LibTiktoken" do
       messages[0] = message
       Tiktoken::LibTiktoken.get_chat_completion_max_tokens_raw(model, 1, messages).should eq 4078
     end
-  
+
     it "returns the number of tokens in a given messages" do
       model = "gpt-4"
       message_array = [
