@@ -298,7 +298,7 @@ pub extern "C" fn corebpe_encode_ordinary_raw(
     ptr: *mut CoreBPE,
     text: *const c_char,
     num_tokens: *mut u32,
-) -> *mut c_size_t {
+) -> *mut usize {
     if ptr.is_null() {
         eprintln!("Null pointer provided!");
         return std::ptr::null_mut();
@@ -324,19 +324,14 @@ pub extern "C" fn corebpe_encode_ordinary_raw(
     let mut num_tokens = unsafe { *num_tokens };
     let corebpe = unsafe { &mut *ptr };
     let encoded = corebpe.encode_ordinary(text);
-    match encoded {
-        Ok(encoded) => {
-            let encoded = encoded
-                .into_iter()
-                .map(|x| x as c_size_t)
-                .collect::<Vec<_>>();
-            num_tokens = encoded.len() as u32;
-            let boxed = encoded.into_boxed_slice();
-            Box::into_raw(boxed)
-        }
-        Err(_) => {
-            eprintln!("Failed to encode text!");
-            std::ptr::null_mut()
-        }
+    if encoded.len() > u32::MAX as usize {
+        eprintln!("Encoded exceeds u32 range!");
+        return std::ptr::null_mut();
     }
+    num_tokens = encoded.len() as u32;
+    let encoded = encoded.into_boxed_slice();
+    let encoded = encoded.into_vec();
+    let encoded = encoded.as_ptr();
+    let encoded = encoded as *mut usize;
+    encoded
 }
