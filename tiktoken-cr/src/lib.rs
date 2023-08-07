@@ -36,6 +36,7 @@ pub extern "C" fn cl100k_base_raw() -> *mut CoreBPE {
     Box::into_raw(boxed)
 }
 
+#[no_mangle]
 pub extern "C" fn destroy_corebpe_raw(ptr: *mut CoreBPE) {
     if ptr.is_null() {
         return;

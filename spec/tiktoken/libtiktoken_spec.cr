@@ -7,6 +7,38 @@ describe "Tiktoken::LibTiktoken" do
       Tiktoken::LibTiktoken.get_completion_max_tokens_raw("gpt-4", "I am a tanuki.").should eq 8186
     end
   end
+  
+  describe "#r50k_base" do
+    it "returns CoreBPE" do
+      corebpe = Tiktoken::LibTiktoken.r50k_base_raw
+      corebpe.should be_a(Pointer(Void))
+      Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
+    end
+  end
+
+  describe "p50k_base" do
+    it "returns CoreBPE" do
+      corebpe = Tiktoken::LibTiktoken.p50k_base_raw
+      corebpe.should be_a(Pointer(Void))
+      Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
+    end
+  end
+
+  describe "p50k_edit" do
+    it "returns CoreBPE" do
+      corebpe = Tiktoken::LibTiktoken.p50k_edit_raw
+      corebpe.should be_a(Pointer(Void))
+      Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
+    end
+  end
+
+  describe "cl100k_base" do
+    it "returns CoreBPE" do
+      corebpe = Tiktoken::LibTiktoken.cl100k_base_raw
+      corebpe.should be_a(Pointer(Void))
+      Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
+    end
+  end
 
   describe "#num_tokens_from_messages" do
     it "returns the number of tokens in a given message" do
