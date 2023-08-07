@@ -1,5 +1,5 @@
 use std::convert::TryInto;
-use std::ffi::{CStr, CString};
+use std::ffi::CStr;
 use std::os::raw::c_char;
 use tiktoken_rs;
 use tiktoken_rs::CoreBPE;
@@ -331,4 +331,86 @@ pub extern "C" fn corebpe_encode_ordinary_raw(
     let boxed = encoded.into_boxed_slice();
     let ptr = Box::into_raw(boxed);
     ptr as *mut u64
+}
+
+#[no_mangle]
+pub extern "C" fn corebpe_encode_with_special_tokens_raw(
+    ptr: *mut CoreBPE,
+    text: *const c_char,
+    num_tokens: *mut u32,
+) -> *mut u64 {
+    if ptr.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if text.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if num_tokens.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    let text = unsafe {
+        let raw = CStr::from_ptr(text);
+        match raw.to_str() {
+            Ok(valid_str) => valid_str,
+            Err(_) => {
+                eprintln!("Invalid UTF-8 sequence provided!");
+                return std::ptr::null_mut();
+            }
+        }
+    };
+    let corebpe = unsafe { &mut *ptr };
+    let encoded = corebpe.encode_with_special_tokens(text);
+    if encoded.len() > u32::MAX as usize {
+        eprintln!("Encoded exceeds u32 range!");
+        return std::ptr::null_mut();
+    }
+    unsafe { *num_tokens = encoded.len() as u32 };
+    let boxed = encoded.into_boxed_slice();
+    let ptr = Box::into_raw(boxed);
+    ptr as *mut u64
+}
+
+#[no_mangle]
+pub extern "C" fn corebpe_decode_raw(
+    ptr: *mut CoreBPE,
+    tokens: *const u64,
+    len: *mut u32,
+) -> *mut c_char {
+    if ptr.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if tokens.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    if len.is_null() {
+        eprintln!("Null pointer provided!");
+        return std::ptr::null_mut();
+    }
+    let tokens = unsafe { std::slice::from_raw_parts(tokens, *len as usize) };
+    let tokens: Vec<usize> = tokens.iter().map(|&x| x as usize).collect();
+
+    let corebpe = unsafe { &mut *ptr };
+    let decoded = corebpe.decode(tokens);
+    let decoded = match decoded {
+        Ok(decoded) => decoded,
+        Err(_) => {
+            eprintln!("Failed to decode!");
+            return std::ptr::null_mut();
+        }
+    };
+    unsafe { *len = decoded.len() as u32 }; // FIXME ?
+    let c_str = match std::ffi::CString::new(decoded) {
+        Ok(c_str) => c_str,
+        Err(_) => {
+            eprintln!("Failed to convert to CString!");
+            return std::ptr::null_mut();
+        }
+    };
+    let ptr = c_str.into_raw();
+    ptr
 }
