@@ -4,11 +4,11 @@ else
 	EXT := so
 endif
 
-test: tiktoken-cr/target/debug/libtiktoken_cr.$(EXT)
-	LIBRARY_PATH=$(PWD)/tiktoken-cr/target/debug:$(LIBRARY_PATH) LD_LIBRARY_PATH=$(PWD)/tiktoken-cr/target/debug crystal spec
+test: tiktoken-c/target/debug/libtiktoken_c.$(EXT)
+	LIBRARY_PATH=$(PWD)/tiktoken-c/target/debug:$(LIBRARY_PATH) LD_LIBRARY_PATH=$(PWD)/tiktoken-c/target/debug crystal spec
 
-tiktoken-cr/target/debug/libtiktoken_cr.$(EXT): tiktoken-cr/src/lib.rs tiktoken-cr/Cargo.toml
-	cd tiktoken-cr && cargo build
+tiktoken-c/target/debug/libtiktoken_c.$(EXT): tiktoken-c/src/lib.rs tiktoken-c/Cargo.toml
+	cd tiktoken-c && cargo build
 
 clean:
-	rm -rf tiktoken-cr/target
+	rm -rf tiktoken-c/target

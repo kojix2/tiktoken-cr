@@ -1,5 +1,5 @@
 module Tiktoken
-  @[Link("tiktoken_cr")]
+  @[Link("tiktoken_c")]
   lib LibTiktoken
     struct FunctionCall
       name : LibC::Char*
