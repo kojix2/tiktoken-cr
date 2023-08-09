@@ -5,7 +5,7 @@ use tiktoken_rs;
 use tiktoken_rs::CoreBPE;
 
 #[no_mangle]
-pub extern "C" fn r50k_base_raw() -> *mut CoreBPE {
+pub extern "C" fn c_r50k_base() -> *mut CoreBPE {
     let bpe = tiktoken_rs::r50k_base();
     let corebpe = bpe.unwrap();
     let boxed = Box::new(corebpe);
@@ -13,7 +13,7 @@ pub extern "C" fn r50k_base_raw() -> *mut CoreBPE {
 }
 
 #[no_mangle]
-pub extern "C" fn p50k_base_raw() -> *mut CoreBPE {
+pub extern "C" fn c_p50k_base() -> *mut CoreBPE {
     let bpe = tiktoken_rs::p50k_base();
     let corebpe = bpe.unwrap();
     let boxed = Box::new(corebpe);
@@ -21,7 +21,7 @@ pub extern "C" fn p50k_base_raw() -> *mut CoreBPE {
 }
 
 #[no_mangle]
-pub extern "C" fn p50k_edit_raw() -> *mut CoreBPE {
+pub extern "C" fn c_p50k_edit() -> *mut CoreBPE {
     let bpe = tiktoken_rs::p50k_edit();
     let corebpe = bpe.unwrap();
     let boxed = Box::new(corebpe);
@@ -29,7 +29,7 @@ pub extern "C" fn p50k_edit_raw() -> *mut CoreBPE {
 }
 
 #[no_mangle]
-pub extern "C" fn cl100k_base_raw() -> *mut CoreBPE {
+pub extern "C" fn c_cl100k_base() -> *mut CoreBPE {
     let bpe = tiktoken_rs::cl100k_base();
     let corebpe = bpe.unwrap();
     let boxed = Box::new(corebpe);
@@ -37,7 +37,7 @@ pub extern "C" fn cl100k_base_raw() -> *mut CoreBPE {
 }
 
 #[no_mangle]
-pub extern "C" fn destroy_corebpe_raw(ptr: *mut CoreBPE) {
+pub extern "C" fn c_destroy_corebpe(ptr: *mut CoreBPE) {
     if ptr.is_null() {
         return;
     }
@@ -83,7 +83,7 @@ fn c_str_to_string(ptr: *const c_char) -> Option<String> {
 }
 
 #[no_mangle]
-pub extern "C" fn get_completion_max_tokens_raw(
+pub extern "C" fn c_get_completion_max_tokens(
     model: *const c_char,
     prompt: *const c_char,
 ) -> i32 {
@@ -131,7 +131,7 @@ pub extern "C" fn get_completion_max_tokens_raw(
 }
 
 #[no_mangle]
-pub extern "C" fn num_tokens_from_messages_raw(
+pub extern "C" fn c_num_tokens_from_messages(
     model: *const c_char,
     num_messages: u32,
     messages: *const ChatCompletionRequestMessage2,
@@ -197,7 +197,7 @@ pub extern "C" fn num_tokens_from_messages_raw(
 }
 
 #[no_mangle]
-pub extern "C" fn get_chat_completion_max_tokens_raw(
+pub extern "C" fn c_get_chat_completion_max_tokens(
     model: *const c_char,
     num_messages: u32,
     messages: *const ChatCompletionRequestMessage2,
@@ -263,7 +263,7 @@ pub extern "C" fn get_chat_completion_max_tokens_raw(
 }
 
 #[no_mangle]
-pub extern "C" fn get_bpe_from_model_raw(model: *const c_char) -> *mut CoreBPE {
+pub extern "C" fn c_get_bpe_from_model(model: *const c_char) -> *mut CoreBPE {
     if model.is_null() {
         eprintln!("Null pointer provided!");
         return std::ptr::null_mut();
@@ -294,7 +294,7 @@ pub extern "C" fn get_bpe_from_model_raw(model: *const c_char) -> *mut CoreBPE {
 //
 
 #[no_mangle]
-pub extern "C" fn corebpe_encode_ordinary_raw(
+pub extern "C" fn c_corebpe_encode_ordinary(
     ptr: *mut CoreBPE,
     text: *const c_char,
     num_tokens: *mut u32,
@@ -334,7 +334,7 @@ pub extern "C" fn corebpe_encode_ordinary_raw(
 }
 
 #[no_mangle]
-pub extern "C" fn corebpe_encode_with_special_tokens_raw(
+pub extern "C" fn c_corebpe_encode_with_special_tokens(
     ptr: *mut CoreBPE,
     text: *const c_char,
     num_tokens: *mut u32,
@@ -374,7 +374,7 @@ pub extern "C" fn corebpe_encode_with_special_tokens_raw(
 }
 
 #[no_mangle]
-pub extern "C" fn corebpe_decode_raw(
+pub extern "C" fn c_corebpe_decode(
     ptr: *mut CoreBPE,
     tokens: *const u64,
     num_tokens: u32,

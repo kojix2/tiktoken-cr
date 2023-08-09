@@ -16,31 +16,31 @@ struct ChatCompletionRequestMessage {
   const char *name;
   const FunctionCall *function_call; // optional (NULL)
 
-void *r50k_base_raw();    // returns a pointer to CoreBPE
-void *p50k_base_raw();    // returns a pointer to CoreBPE
-void *p50k_edit_raw();    // returns a pointer to CoreBPE
-void *cl100k_base_raw();  // returns a pointer to CoreBPE
-void destroy_corebpe_raw(void *corebpe);
+void *c_r50k_base();    // returns a pointer to CoreBPE
+void *c_p50k_base();    // returns a pointer to CoreBPE
+void *c_p50k_edit();    // returns a pointer to CoreBPE
+void *c_cl100k_base();  // returns a pointer to CoreBPE
+void c_destroy_corebpe(void *corebpe);
 
-int32_t get_completion_max_tokens_raw(const char *model, const char *prompt);
+int32_t c_get_completion_max_tokens(const char *model, const char *prompt);
 
-int32_t num_tokens_from_messages_raw(const char *model,
+int32_t c_num_tokens_from_messages(const char *model,
                                      uint32_t num_messages,
                                      const ChatCompletionRequestMessage *messages);
 
-int32_t get_chat_completion_max_tokens_raw(const char *model,
+int32_t c_get_chat_completion_max_tokens(const char *model,
                                            uint32_t num_messages,
                                            const ChatCompletionRequestMessage *messages);
 
-void *get_bpe_from_model_raw(const char *model);  // returns a pointer to CoreBPE
+void *c_get_bpe_from_model(const char *model);  // returns a pointer to CoreBPE
 
-uint64_t *corebpe_encode_ordinary_raw(void *corebpe, const char *text, uint32_t *num_tokens);
+uint64_t *c_corebpe_encode_ordinary(void *corebpe, const char *text, uint32_t *num_tokens);
 
-uint64_t *corebpe_encode_with_special_tokens_raw(void *corebpe,
+uint64_t *c_corebpe_encode_with_special_tokens(void *corebpe,
                                                  const char *text,
                                                  uint32_t *num_tokens);
 
-char *corebpe_decode_raw(void *corebpe, const uint64_t *tokens, uint32_t num_tokens);
+char *c_corebpe_decode(void *corebpe, const uint64_t *tokens, uint32_t num_tokens);
 ```
 
 See https://github.com/zurawiki/tiktoken-rs/blob/main/tiktoken-rs/src/api.rs
