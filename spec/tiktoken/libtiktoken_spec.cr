@@ -132,12 +132,14 @@ describe "Tiktoken::LibTiktoken" do
       arr_ptr2 = Tiktoken::LibTiktoken.corebpe_encode_with_special_tokens_raw(corebpe, string, num_tokens2)
       n1 = num_tokens1[0]
       n2 = num_tokens2[0]
-      p Array.new(n1) { |i| arr_ptr1[i] }
-      p Array.new(n2) { |i| arr_ptr2[i] }
+      t1 = Array.new(n1) { |i| arr_ptr1[i] }
+      t2 = Array.new(n2) { |i| arr_ptr2[i] }
+      t1.should eq [1212, 318, 257, 845, 4950, 1110, 13]
+      t2.should eq [1212, 318, 257, 845, 4950, 1110, 13]
       s1 = Tiktoken::LibTiktoken.corebpe_decode_raw(corebpe, arr_ptr1, n1)
       s2 = Tiktoken::LibTiktoken.corebpe_decode_raw(corebpe, arr_ptr2, n2)
-      p String.new(s1)
-      p String.new(s2)
+      String.new(s1).should eq string
+      String.new(s2).should eq string
       Tiktoken::LibTiktoken.destroy_corebpe_raw(corebpe)
     end
   end
