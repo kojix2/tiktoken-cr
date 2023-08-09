@@ -11,6 +11,8 @@ jobs:
         crystal: [ '1.9' ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: recursive
       - uses: crystal-lang/install-crystal@v1
         with:
           crystal: ${{ matrix.crystal }}
