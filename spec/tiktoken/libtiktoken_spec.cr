@@ -11,7 +11,7 @@ describe "Tiktoken::LibTiktoken" do
   describe "#r50k_base" do
     it "returns CoreBPE" do
       corebpe = Tiktoken::LibTiktoken.c_r50k_base
-      corebpe.should be_a(Pointer(Void))
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
       Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
     end
   end
@@ -19,7 +19,7 @@ describe "Tiktoken::LibTiktoken" do
   describe "p50k_base" do
     it "returns CoreBPE" do
       corebpe = Tiktoken::LibTiktoken.c_p50k_base
-      corebpe.should be_a(Pointer(Void))
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
       Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
     end
   end
@@ -27,7 +27,7 @@ describe "Tiktoken::LibTiktoken" do
   describe "p50k_edit" do
     it "returns CoreBPE" do
       corebpe = Tiktoken::LibTiktoken.c_p50k_edit
-      corebpe.should be_a(Pointer(Void))
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
       Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
     end
   end
@@ -35,7 +35,7 @@ describe "Tiktoken::LibTiktoken" do
   describe "cl100k_base" do
     it "returns CoreBPE" do
       corebpe = Tiktoken::LibTiktoken.c_cl100k_base
-      corebpe.should be_a(Pointer(Void))
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
       Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
     end
   end
@@ -126,8 +126,8 @@ describe "Tiktoken::LibTiktoken" do
     it "returns a pointer to a CoreBPEEncodedString" do
       corebpe = Tiktoken::LibTiktoken.c_r50k_base
       string = "This is a very beautiful day."
-      num_tokens1 = Pointer(UInt32).malloc(1)
-      num_tokens2 = Pointer(UInt32).malloc(1)
+      num_tokens1 = Pointer(LibC::SizeT).malloc(1)
+      num_tokens2 = Pointer(LibC::SizeT).malloc(1)
       arr_ptr1 = Tiktoken::LibTiktoken.c_corebpe_encode_ordinary(corebpe, string, num_tokens1)
       arr_ptr2 = Tiktoken::LibTiktoken.c_corebpe_encode_with_special_tokens(corebpe, string, num_tokens2)
       n1 = num_tokens1[0]

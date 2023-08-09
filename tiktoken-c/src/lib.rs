@@ -1,4 +1,3 @@
-use std::convert::TryInto;
 use std::ffi::CStr;
 use std::os::raw::c_char;
 use tiktoken_rs;
@@ -47,17 +46,17 @@ pub extern "C" fn c_destroy_corebpe(ptr: *mut CoreBPE) {
 }
 
 #[repr(C)]
-pub struct FunctionCall2 {
+pub struct CFunctionCall {
     pub name: *const c_char,
     pub arguments: *const c_char,
 }
 
 #[repr(C)]
-pub struct ChatCompletionRequestMessage2 {
+pub struct CChatCompletionRequestMessage {
     pub role: *const c_char,
     pub content: *const c_char,
     pub name: *const c_char,
-    pub function_call: *const FunctionCall2,
+    pub function_call: *const CFunctionCall,
 }
 
 fn get_string_from_c_char(ptr: *const c_char) -> Result<String, std::str::Utf8Error> {
@@ -86,22 +85,22 @@ fn c_str_to_string(ptr: *const c_char) -> Option<String> {
 pub extern "C" fn c_get_completion_max_tokens(
     model: *const c_char,
     prompt: *const c_char,
-) -> i32 {
+) -> usize {
     if model.is_null() {
-        eprintln!("Null pointer provided!");
-        return -1;
+        eprintln!("Null pointer provided for model!");
+        return usize::MAX;
     }
     if prompt.is_null() {
-        eprintln!("Null pointer provided!");
-        return -2;
+        eprintln!("Null pointer provided for prompt!");
+        return usize::MAX;
     }
     let model = unsafe {
         let raw = CStr::from_ptr(model);
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
-                return -3;
+                eprintln!("Invalid UTF-8 sequence provided for model!");
+                return usize::MAX;
             }
         }
     };
@@ -110,22 +109,16 @@ pub extern "C" fn c_get_completion_max_tokens(
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
-                return -4;
+                eprintln!("Invalid UTF-8 sequence provided for prompt!");
+                return usize::MAX;
             }
         }
     };
     match tiktoken_rs::get_completion_max_tokens(model, prompt) {
-        Ok(max_tokens) => {
-            if max_tokens > i32::MAX.try_into().unwrap() {
-                eprintln!("Max tokens exceeds i32 range!");
-                return -6;
-            }
-            max_tokens as i32
-        }
+        Ok(max_tokens) => max_tokens,
         Err(_) => {
             eprintln!("Failed to get completion max tokens!");
-            return -5;
+            return usize::MAX;
         }
     }
 }
@@ -134,23 +127,23 @@ pub extern "C" fn c_get_completion_max_tokens(
 pub extern "C" fn c_num_tokens_from_messages(
     model: *const c_char,
     num_messages: u32,
-    messages: *const ChatCompletionRequestMessage2,
-) -> i32 {
+    messages: *const CChatCompletionRequestMessage,
+) -> usize {
     if model.is_null() {
-        eprintln!("Null pointer provided!");
-        return -1;
+        eprintln!("Null pointer provided for model!");
+        return usize::MAX;
     }
     if messages.is_null() {
-        eprintln!("Null pointer provided!");
-        return -2;
+        eprintln!("Null pointer provided for messages!");
+        return usize::MAX;
     }
     let model = unsafe {
         let raw = CStr::from_ptr(model);
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
-                return -3;
+                eprintln!("Invalid UTF-8 sequence provided for model!");
+                return usize::MAX;
             }
         }
     };
@@ -182,16 +175,10 @@ pub extern "C" fn c_num_tokens_from_messages(
         messages_vec
     };
     match tiktoken_rs::num_tokens_from_messages(model, &messages) {
-        Ok(num_tokens) => {
-            if num_tokens > i32::MAX.try_into().unwrap() {
-                eprintln!("Num tokens exceeds i32 range!");
-                return -5;
-            }
-            num_tokens as i32
-        }
+        Ok(num_tokens) => num_tokens,
         Err(_) => {
             eprintln!("Failed to get num tokens!");
-            return -4;
+            return usize::MAX;
         }
     }
 }
@@ -200,23 +187,23 @@ pub extern "C" fn c_num_tokens_from_messages(
 pub extern "C" fn c_get_chat_completion_max_tokens(
     model: *const c_char,
     num_messages: u32,
-    messages: *const ChatCompletionRequestMessage2,
-) -> i32 {
+    messages: *const CChatCompletionRequestMessage,
+) -> usize {
     if model.is_null() {
-        eprintln!("Null pointer provided!");
-        return -1;
+        eprintln!("Null pointer provided for model!");
+        return usize::MAX;
     }
     if messages.is_null() {
-        eprintln!("Null pointer provided!");
-        return -2;
+        eprintln!("Null pointer provided for messages!");
+        return usize::MAX;
     }
     let model = unsafe {
         let raw = CStr::from_ptr(model);
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
-                return -3;
+                eprintln!("Invalid UTF-8 sequence provided for model!");
+                return usize::MAX;
             }
         }
     };
@@ -248,16 +235,10 @@ pub extern "C" fn c_get_chat_completion_max_tokens(
         messages_vec
     };
     match tiktoken_rs::get_chat_completion_max_tokens(model, &messages) {
-        Ok(max_tokens) => {
-            if max_tokens > i32::MAX.try_into().unwrap() {
-                eprintln!("Max tokens exceeds i32 range!");
-                return -5;
-            }
-            max_tokens as i32
-        }
+        Ok(max_tokens) => max_tokens,
         Err(_) => {
             eprintln!("Failed to get max tokens!");
-            return -4;
+            return usize::MAX;
         }
     }
 }
@@ -265,7 +246,7 @@ pub extern "C" fn c_get_chat_completion_max_tokens(
 #[no_mangle]
 pub extern "C" fn c_get_bpe_from_model(model: *const c_char) -> *mut CoreBPE {
     if model.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for model!");
         return std::ptr::null_mut();
     }
     let model = unsafe {
@@ -273,7 +254,7 @@ pub extern "C" fn c_get_bpe_from_model(model: *const c_char) -> *mut CoreBPE {
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
+                eprintln!("Invalid UTF-8 sequence provided for model!");
                 return std::ptr::null_mut();
             }
         }
@@ -291,24 +272,22 @@ pub extern "C" fn c_get_bpe_from_model(model: *const c_char) -> *mut CoreBPE {
     }
 }
 
-//
+// get_bpe_from_tokenizer is not yet implemented.
+// Use c_r50k_base(), c_p50k_base(), c_p50k_edit(), and c_cl100k_base()
+// instead.
 
 #[no_mangle]
 pub extern "C" fn c_corebpe_encode_ordinary(
     ptr: *mut CoreBPE,
     text: *const c_char,
-    num_tokens: *mut u32,
-) -> *mut u64 {
+    num_tokens: *mut usize,
+) -> *mut usize {
     if ptr.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for CoreBPE!");
         return std::ptr::null_mut();
     }
     if text.is_null() {
-        eprintln!("Null pointer provided!");
-        return std::ptr::null_mut();
-    }
-    if num_tokens.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for text!");
         return std::ptr::null_mut();
     }
     let text = unsafe {
@@ -316,39 +295,34 @@ pub extern "C" fn c_corebpe_encode_ordinary(
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
+                eprintln!("Invalid UTF-8 sequence provided for text!");
                 return std::ptr::null_mut();
             }
         }
     };
     let corebpe = unsafe { &mut *ptr };
     let encoded = corebpe.encode_ordinary(text);
-    if encoded.len() > u32::MAX as usize {
-        eprintln!("Encoded exceeds u32 range!");
-        return std::ptr::null_mut();
-    }
-    unsafe { *num_tokens = encoded.len() as u32 };
+    unsafe {
+        if !num_tokens.is_null() {
+            *num_tokens = encoded.len();
+        }
+    };
     let boxed = encoded.into_boxed_slice();
-    let ptr = Box::into_raw(boxed);
-    ptr as *mut u64
+    Box::into_raw(boxed) as *mut usize
 }
 
 #[no_mangle]
 pub extern "C" fn c_corebpe_encode_with_special_tokens(
     ptr: *mut CoreBPE,
     text: *const c_char,
-    num_tokens: *mut u32,
-) -> *mut u64 {
+    num_tokens: *mut usize,
+) -> *mut usize {
     if ptr.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for CoreBPE!");
         return std::ptr::null_mut();
     }
     if text.is_null() {
-        eprintln!("Null pointer provided!");
-        return std::ptr::null_mut();
-    }
-    if num_tokens.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for text!");
         return std::ptr::null_mut();
     }
     let text = unsafe {
@@ -356,38 +330,37 @@ pub extern "C" fn c_corebpe_encode_with_special_tokens(
         match raw.to_str() {
             Ok(valid_str) => valid_str,
             Err(_) => {
-                eprintln!("Invalid UTF-8 sequence provided!");
+                eprintln!("Invalid UTF-8 sequence provided for text!");
                 return std::ptr::null_mut();
             }
         }
     };
     let corebpe = unsafe { &mut *ptr };
     let encoded = corebpe.encode_with_special_tokens(text);
-    if encoded.len() > u32::MAX as usize {
-        eprintln!("Encoded exceeds u32 range!");
-        return std::ptr::null_mut();
-    }
-    unsafe { *num_tokens = encoded.len() as u32 };
+    unsafe {
+        if !num_tokens.is_null() {
+            *num_tokens = encoded.len();
+        }
+    };
     let boxed = encoded.into_boxed_slice();
-    let ptr = Box::into_raw(boxed);
-    ptr as *mut u64
+    Box::into_raw(boxed) as *mut usize
 }
 
 #[no_mangle]
 pub extern "C" fn c_corebpe_decode(
     ptr: *mut CoreBPE,
-    tokens: *const u64,
-    num_tokens: u32,
+    tokens: *const usize,
+    num_tokens: usize,
 ) -> *mut c_char {
     if ptr.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for CoreBPE!");
         return std::ptr::null_mut();
     }
     if tokens.is_null() {
-        eprintln!("Null pointer provided!");
+        eprintln!("Null pointer provided for tokens!");
         return std::ptr::null_mut();
     }
-    let tokens = unsafe { std::slice::from_raw_parts(tokens, num_tokens as usize) };
+    let tokens = unsafe { std::slice::from_raw_parts(tokens, num_tokens) };
     let tokens: Vec<usize> = tokens.iter().map(|&x| x as usize).collect();
 
     let corebpe = unsafe { &mut *ptr };
