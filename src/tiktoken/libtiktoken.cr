@@ -15,6 +15,7 @@ module Tiktoken
 
     type CoreBPE = Void
 
+    fun c_init_logger()
     fun c_r50k_base : CoreBPE*
     fun c_p50k_base : CoreBPE*
     fun c_p50k_edit : CoreBPE*
