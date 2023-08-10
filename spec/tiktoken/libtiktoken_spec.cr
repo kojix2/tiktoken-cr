@@ -6,6 +6,26 @@ describe "Tiktoken::LibTiktoken" do
     it "returns the maximum number of tokens for a given model" do
       Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", "I am a tanuki.").should eq 8186
     end
+
+    it "retruns the maximum number of tokens for a given model and \"\"" do
+      n = Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", "")
+      n.should eq 8192
+    end
+
+    it "returns LibC::SizeT::MAX if the model is not found" do
+      n = Tiktoken::LibTiktoken.c_get_completion_max_tokens("cat-dog", "I am a tanuki.")
+      n.should eq LibC::SizeT::MAX
+    end
+
+    it "returns LibC::SizeT::MAX if the model is nil" do
+      n = Tiktoken::LibTiktoken.c_get_completion_max_tokens(nil, "I am a tanuki.")
+      n.should eq LibC::SizeT::MAX
+    end
+    
+    it "returns LibC::SizeT::MAX if the prompt is nil" do
+      n = Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", nil)
+      n.should eq LibC::SizeT::MAX
+    end
   end
 
   describe "#r50k_base" do
@@ -119,6 +139,40 @@ describe "Tiktoken::LibTiktoken" do
       ]
       messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
       Tiktoken::LibTiktoken.c_get_chat_completion_max_tokens(model, message_array.size, messages).should eq 8156
+    end
+  end
+
+  describe "#c_get_bpe_from_model" do
+    it "returns a pointer to a CoreBPE for gpt-3.5-turbo" do
+      model = "gpt-3.5-turbo"
+      corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      corebpe.null?.should be_false
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
+    end
+
+    it "returns a pointer to a CoreBPE for gpt-4" do
+      model = "gpt-4"
+      corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      corebpe.null?.should be_false
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
+    end
+
+    it "returns a null pointer for a nil model" do
+      model = nil
+      corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      corebpe.null?.should be_true
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe) # should work if null
+    end
+
+    it "returns a null pointer for an invalid model" do
+      model = "cat-dog"
+      corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      corebpe.null?.should be_true
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe) # should work if null
     end
   end
 
