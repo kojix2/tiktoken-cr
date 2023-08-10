@@ -21,7 +21,7 @@ module Tiktoken
       Array.new(num_tokens[0]) { |i| tokens[i] } # always be UInt64 here?
     end
 
-    def decode(tokens)
+    def decode(tokens) : String
       num_tokens = tokens.size
       str_ptr = Tiktoken::LibTiktoken.c_corebpe_decode(@corebpe, tokens, num_tokens)
       String.new(str_ptr)
