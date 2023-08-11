@@ -11,4 +11,3 @@ encoding = Tiktoken.encoding_for_model("gpt-4")
 tokens = encoding.encode(text, allowed_special: ["<|endoftext|>"])
 p tokens
 p encoding.decode(tokens)
-

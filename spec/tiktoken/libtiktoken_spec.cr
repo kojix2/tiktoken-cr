@@ -21,7 +21,7 @@ describe "Tiktoken::LibTiktoken" do
       n = Tiktoken::LibTiktoken.c_get_completion_max_tokens(nil, "I am a tanuki.")
       n.should eq LibC::SizeT::MAX
     end
-    
+
     it "returns LibC::SizeT::MAX if the prompt is nil" do
       n = Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", nil)
       n.should eq LibC::SizeT::MAX
