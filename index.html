@@ -115,15 +115,32 @@ text <span class="o">=</span> <span class="s">&quot;吾輩は猫である。名�
 
 encoding <span class="o">=</span> <span class="t">Tiktoken</span>.encoding_for_model(<span class="s">&quot;gpt-4&quot;</span>)
 tokens <span class="o">=</span> encoding.encode_with_special_tokens(text)
-
-p tokens
-
 <span class="c"># [7305, 122, 164, 120, 102, 15682, 163, 234, 104, 16556, 30591, 30369, 1811, 13372, 25580, 15682, 28713, 2243, 105, 50834, 1811]</span>
 
-p encoding.decode(tokens)
+encoding.decode(tokens)
+<span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span></code></pre>
+<p>Count the number of ChatGPT tokens</p>
+<pre><code class="language-crystal">model <span class="o">=</span> <span class="s">&quot;gpt-4&quot;</span>
+messages <span class="o">=</span> [
+  {
+    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;system&quot;</span>,
+    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;You are a helpful assistant that only speaks French.&quot;</span>,
+  },
+  {
+    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;user&quot;</span>,
+    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;Hello, how are you?&quot;</span>,
+  },
+  {
+    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
+    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;Parlez-vous francais?&quot;</span>,
+  },
+]
 
-<span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span>
-</code></pre>
+<span class="t">Tiktoken</span>.num_tokens_from_messages(model, messages)
+<span class="c"># 36</span>
+
+<span class="t">Tiktoken</span>.chat_completion_max_tokens(model, messages)
+<span class="c"># 8156</span></code></pre>
 <h2><a id="documentation" class="anchor" href="#documentation">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
