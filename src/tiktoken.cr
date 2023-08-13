@@ -18,17 +18,17 @@ module Tiktoken
       role = message["role"]
       content = message.has_key?("content") ? message["content"].to_unsafe : Pointer(LibC::Char).null
       name = message.has_key?("name") ? message["name"].to_unsafe : Pointer(LibC::Char).null
-      function_call =\
-        if message.has_key?("function_call")
-          Pointer(LibTiktoken::FunctionCall).malloc(1) do
-            LibTiktoken::FunctionCall.new(
-              name: message["function_call"]["name"],
-              arguments: message["function_call"]["arguments"]
-            )
-          end
-        else
-          Pointer(LibTiktoken::FunctionCall).null
-        end
+      function_call = \
+         if message.has_key?("function_call")
+           Pointer(LibTiktoken::FunctionCall).malloc(1) do
+             LibTiktoken::FunctionCall.new(
+               name: message["function_call"]["name"],
+               arguments: message["function_call"]["arguments"]
+             )
+           end
+         else
+           Pointer(LibTiktoken::FunctionCall).null
+         end
       messages_ptr[i] = LibTiktoken::ChatCompletionRequestMessage.new(
         role: role,
         content: content,
@@ -48,17 +48,17 @@ module Tiktoken
       role = message["role"]
       content = message.has_key?("content") ? message["content"].to_unsafe : Pointer(LibC::Char).null
       name = message.has_key?("name") ? message["name"].to_unsafe : Pointer(LibC::Char).null
-      function_call =\
-        if message.has_key?("function_call")
-          Pointer(LibTiktoken::FunctionCall).malloc(1) do
-            LibTiktoken::FunctionCall.new(
-              name: message["function_call"]["name"],
-              arguments: message["function_call"]["arguments"]
-            )
-          end
-        else
-          Pointer(LibTiktoken::FunctionCall).null
-        end
+      function_call = \
+         if message.has_key?("function_call")
+           Pointer(LibTiktoken::FunctionCall).malloc(1) do
+             LibTiktoken::FunctionCall.new(
+               name: message["function_call"]["name"],
+               arguments: message["function_call"]["arguments"]
+             )
+           end
+         else
+           Pointer(LibTiktoken::FunctionCall).null
+         end
       messages_ptr[i] = LibTiktoken::ChatCompletionRequestMessage.new(
         role: role,
         content: content,
