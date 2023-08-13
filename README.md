@@ -1,11 +1,11 @@
 # tiktoken-cr
 
+[![test](https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml/badge.svg)](https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml)
+
 Tiktoken for Crystalists.
 
 - [tiktoken-rs](https://github.com/zurawiki/tiktoken-rs)
 - [tiktoken-c](https://github.com/kojix2/tiktoken-c)
-
-Still Under development. 
 
 ## Usage
 
@@ -26,6 +26,14 @@ p encoding.decode(tokens)
 # "吾輩は猫である。名前はたぬき。"
 
 ```
+
+## Contributing
+
+- Report bugs
+- Fix bugs and submit pull requests
+- Write, clarify, or fix documentation
+- Suggest or add new features
+- Make a donation
 
 ## Acknowledgement
 
