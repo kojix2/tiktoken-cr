@@ -27,6 +27,10 @@ p encoding.decode(tokens)
 
 ```
 
+## Documentation
+
+[API Documentation](https://kojix2.github.io/tiktoken-cr/)
+
 ## Contributing
 
 - Report bugs
