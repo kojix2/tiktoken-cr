@@ -16,15 +16,36 @@ text = "吾輩は猫である。名前はたぬき。"
 
 encoding = Tiktoken.encoding_for_model("gpt-4")
 tokens = encoding.encode_with_special_tokens(text)
-
-p tokens
-
 # [7305, 122, 164, 120, 102, 15682, 163, 234, 104, 16556, 30591, 30369, 1811, 13372, 25580, 15682, 28713, 2243, 105, 50834, 1811]
 
-p encoding.decode(tokens)
-
+encoding.decode(tokens)
 # "吾輩は猫である。名前はたぬき。"
+```
 
+Count the number of ChatGPT tokens
+
+```crystal
+model = "gpt-4"
+messages = [
+  {
+    "role"    => "system",
+    "content" => "You are a helpful assistant that only speaks French.",
+  },
+  {
+    "role"    => "user",
+    "content" => "Hello, how are you?",
+  },
+  {
+    "role"    => "assistant",
+    "content" => "Parlez-vous francais?",
+  },
+]
+
+Tiktoken.num_tokens_from_messages(model, messages)
+# 36
+
+Tiktoken.chat_completion_max_tokens(model, messages)
+# 8156
 ```
 
 ## Documentation
