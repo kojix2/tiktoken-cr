@@ -1,5 +1,7 @@
 ifeq ($(shell uname),Darwin)
 	EXT := dylib
+else ifeq ($(OS),Windows_NT)
+	EXT := dll
 else
 	EXT := so
 endif
