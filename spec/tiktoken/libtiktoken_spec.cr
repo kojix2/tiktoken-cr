@@ -7,7 +7,7 @@ describe "Tiktoken::LibTiktoken" do
       Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", "I am a tanuki.").should eq 8186
     end
 
-    it "retruns the maximum number of tokens for a given model and \"\"" do
+    it "returns the maximum number of tokens for a given model and \"\"" do
       n = Tiktoken::LibTiktoken.c_get_completion_max_tokens("gpt-4", "")
       n.should eq 8192
     end
