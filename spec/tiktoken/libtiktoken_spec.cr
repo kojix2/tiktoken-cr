@@ -112,7 +112,7 @@ describe "Tiktoken::LibTiktoken" do
       )
       messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(1)
       messages[0] = message
-      Tiktoken::LibTiktoken.c_get_chat_completion_max_tokens(model, 1, messages).should eq 4078
+      Tiktoken::LibTiktoken.c_get_chat_completion_max_tokens(model, 1, messages).should eq 16367
     end
 
     it "returns the number of tokens in a given messages" do
