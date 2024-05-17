@@ -60,6 +60,14 @@ describe "Tiktoken::LibTiktoken" do
     end
   end
 
+  describe "o200k_base" do
+    it "returns CoreBPE" do
+      corebpe = Tiktoken::LibTiktoken.c_o200k_base
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
+    end
+  end
+
   describe "#num_tokens_from_messages" do
     it "returns the number of tokens in a given message" do
       model = "gpt-3.5-turbo-0301"
@@ -153,6 +161,14 @@ describe "Tiktoken::LibTiktoken" do
 
     it "returns a pointer to a CoreBPE for gpt-4" do
       model = "gpt-4"
+      corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
+      corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
+      corebpe.null?.should be_false
+      Tiktoken::LibTiktoken.c_destroy_corebpe(corebpe)
+    end
+
+    it "returns a pointer to a CoreBPE for gpt-4o" do
+      model = "gpt-4o"
       corebpe = Tiktoken::LibTiktoken.c_get_bpe_from_model(model)
       corebpe.should be_a(Pointer(Tiktoken::LibTiktoken::CoreBPE))
       corebpe.null?.should be_false

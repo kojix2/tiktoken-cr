@@ -20,6 +20,7 @@ module Tiktoken
     fun c_p50k_base : CoreBPE*
     fun c_p50k_edit : CoreBPE*
     fun c_cl100k_base : CoreBPE*
+    fun c_o200k_base : CoreBPE*
     fun c_destroy_corebpe(corebpe : CoreBPE*)
     fun c_get_completion_max_tokens(model : LibC::Char*, prompt : LibC::Char*) : LibC::SizeT
     fun c_num_tokens_from_messages(model : LibC::Char*, num_messages : UInt32, messages : ChatCompletionRequestMessage*) : LibC::SizeT
