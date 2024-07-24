@@ -29,4 +29,17 @@ describe Tiktoken do
       Tiktoken.chat_completion_max_tokens(model, messages).should eq(8156)
     end
   end
+
+  describe "#VERSION" do
+    it "has a version number" do
+      Tiktoken::VERSION.should be_a(String)
+    end
+  end
+
+  describe "#tiktoken_c_version" do
+    it "return a tiktoken_c version number" do
+      v = Tiktoken.tiktoken_c_version
+      v.should be_a(String)
+    end
+  end
 end

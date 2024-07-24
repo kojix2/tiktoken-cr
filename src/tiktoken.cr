@@ -36,7 +36,7 @@ module Tiktoken
         function_call: function_call
       )
     end
-    LibTiktoken.c_num_tokens_from_messages(model, num_messages, messages_ptr).tap do |n|
+    LibTiktoken.tiktoken_num_tokens_from_messages(model, num_messages, messages_ptr).tap do |n|
       raise "Error in num_tokens_from_messages" if n == LibC::SizeT::MAX
     end
   end
@@ -66,8 +66,12 @@ module Tiktoken
         function_call: function_call
       )
     end
-    LibTiktoken.c_get_chat_completion_max_tokens(model, num_messages, messages_ptr).tap do |n|
+    LibTiktoken.tiktoken_get_chat_completion_max_tokens(model, num_messages, messages_ptr).tap do |n|
       raise "Error in chat_completion_max_tokens" if n == LibC::SizeT::MAX
     end
+  end
+
+  def self.tiktoken_c_version : String
+    String.new(LibTiktoken.tiktoken_c_version)
   end
 end
