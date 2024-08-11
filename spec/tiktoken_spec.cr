@@ -1,5 +1,5 @@
 require "spec"
-require "../src/tiktoken.cr"
+require "../src/tiktoken"
 
 describe Tiktoken do
   model = "gpt-4"

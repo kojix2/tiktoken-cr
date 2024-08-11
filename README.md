@@ -10,7 +10,7 @@ Tiktoken for Crystalists.
 ## Usage
 
 ```crystal
-require "../src/tiktoken.cr"
+require "../src/tiktoken"
 
 text = "吾輩は猫である。名前はたぬき。"
 
