@@ -71,13 +71,13 @@ describe "Tiktoken::LibTiktoken" do
   describe "#num_tokens_from_messages" do
     it "returns the number of tokens in a given message" do
       model = "gpt-3.5-turbo-0301"
-      message = Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+      message = Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
         role: "system",
         name: nil,
         content: "You are a helpful, pattern-following assistant that translates corporate jargon into plain English.",
         function_call: nil
       )
-      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(1)
+      messages = Pointer(Tiktoken::LibTiktoken::CChatCompletionRequestMessage).malloc(1)
       messages[0] = message
       Tiktoken::LibTiktoken.tiktoken_num_tokens_from_messages(model, 1, messages).should eq 26
     end
@@ -85,26 +85,26 @@ describe "Tiktoken::LibTiktoken" do
     it "returns the number of tokens in a given messages" do
       model = "gpt-4"
       message_array = [
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "system",
           name: nil,
           content: "You are a helpful assistant that only speaks French.",
           function_call: nil
         ),
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "user",
           name: nil,
           content: "Hello, how are you?",
           function_call: nil
         ),
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "assistant",
           name: nil,
           content: "Parlez-vous francais?",
           function_call: nil
         ),
       ]
-      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
+      messages = Pointer(Tiktoken::LibTiktoken::CChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
       Tiktoken::LibTiktoken.tiktoken_num_tokens_from_messages(model, message_array.size, messages).should eq 36
     end
   end
@@ -112,13 +112,13 @@ describe "Tiktoken::LibTiktoken" do
   describe "#get_chat_completion_max_tokens" do
     it "returns the maximum number of tokens for a given message" do
       model = "gpt-3.5-turbo"
-      message = Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+      message = Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
         role: "system",
         name: nil,
         content: "You are a helpful assistant that only speaks French.",
         function_call: nil
       )
-      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(1)
+      messages = Pointer(Tiktoken::LibTiktoken::CChatCompletionRequestMessage).malloc(1)
       messages[0] = message
       Tiktoken::LibTiktoken.tiktoken_get_chat_completion_max_tokens(model, 1, messages).should eq 16367
     end
@@ -126,26 +126,26 @@ describe "Tiktoken::LibTiktoken" do
     it "returns the number of tokens in a given messages" do
       model = "gpt-4"
       message_array = [
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "system",
           name: nil,
           content: "You are a helpful assistant that only speaks French.",
           function_call: nil
         ),
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "user",
           name: nil,
           content: "Hello, how are you?",
           function_call: nil
         ),
-        Tiktoken::LibTiktoken::ChatCompletionRequestMessage.new(
+        Tiktoken::LibTiktoken::CChatCompletionRequestMessage.new(
           role: "assistant",
           name: nil,
           content: "Parlez-vous francais?",
           function_call: nil
         ),
       ]
-      messages = Pointer(Tiktoken::LibTiktoken::ChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
+      messages = Pointer(Tiktoken::LibTiktoken::CChatCompletionRequestMessage).malloc(message_array.size) { |i| message_array[i] }
       Tiktoken::LibTiktoken.tiktoken_get_chat_completion_max_tokens(model, message_array.size, messages).should eq 8156
     end
   end
@@ -202,8 +202,8 @@ describe "Tiktoken::LibTiktoken" do
       arr_ptr2 = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_with_special_tokens(corebpe, string, num_tokens2)
       n1 = num_tokens1[0]
       n2 = num_tokens2[0]
-      t1 = Array.new(n1) { |i| arr_ptr1[i] }
-      t2 = Array.new(n2) { |i| arr_ptr2[i] }
+      t1 = Array.new(n1) { |i| arr_ptr1[i].to_u32 }
+      t2 = Array.new(n2) { |i| arr_ptr2[i].to_u32 }
       t1.should eq [1212, 318, 257, 845, 4950, 1110, 13]
       t2.should eq [1212, 318, 257, 845, 4950, 1110, 13]
       s1 = Tiktoken::LibTiktoken.tiktoken_corebpe_decode(corebpe, arr_ptr1, n1)
