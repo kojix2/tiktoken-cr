@@ -5,12 +5,36 @@
 
 Tiktoken for Crystalists.
 
-- [tiktoken-c](https://github.com/zurawiki/tiktoken-rs)
+- [tiktoken-c](https://github.com/kojix2/tiktoken-c)
+
+## Installation
+
+```bash
+# Clone with submodules and build tiktoken-c
+git clone --recursive https://github.com/kojix2/tiktoken-cr
+cd tiktoken-cr && cd tiktoken-c && cargo build --release && cd ..
+
+# Run with library path
+export LD_LIBRARY_PATH=./tiktoken-c/target/release:$LD_LIBRARY_PATH  # Linux
+export DYLD_LIBRARY_PATH=./tiktoken-c/target/release:$DYLD_LIBRARY_PATH  # macOS
+crystal build your_program.cr
+
+# Or use --link-flags
+crystal build your_program.cr --link-flags "-L $(pwd)/tiktoken-c/target/release"
+```
+
+Add to `shard.yml`:
+
+```yaml
+dependencies:
+  tiktoken:
+    github: kojix2/tiktoken-cr
+```
 
 ## Usage
 
 ```crystal
-require "../src/tiktoken"
+require "tiktoken"
 
 text = "吾輩は猫である。名前はたぬき。"
 
@@ -63,6 +87,7 @@ Tiktoken.chat_completion_max_tokens(model, messages)
 ## Acknowledgement
 
 This project is inspired by [tiktoken_ruby](https://github.com/IAPark/tiktoken_ruby).
+
 ## LICENSE
 
 MIT
