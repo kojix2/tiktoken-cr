@@ -102,14 +102,34 @@
 <a href="https://tokei.kojix2.net/github/kojix2/tiktoken-cr"><img src="https://img.shields.io/endpoint?url=https://tokei.kojix2.net/badge/github/kojix2/tiktoken-cr/lines" alt="Lines of Code" /></a></p>
 <p>Tiktoken for Crystalists.</p>
 <ul>
-<li><a href="https://github.com/zurawiki/tiktoken-rs">tiktoken-c</a></li>
+<li><a href="https://github.com/kojix2/tiktoken-c">tiktoken-c</a></li>
 </ul>
+<h2><a id="installation" class="anchor" href="#installation">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Installation</h2>
+<pre><code class="language-bash"># Clone with submodules and build tiktoken-c
+git clone --recursive https://github.com/kojix2/tiktoken-cr
+cd tiktoken-cr &amp;&amp; cd tiktoken-c &amp;&amp; cargo build --release &amp;&amp; cd ..
+
+# Run with library path
+export LD_LIBRARY_PATH=./tiktoken-c/target/release:$LD_LIBRARY_PATH  # Linux
+export DYLD_LIBRARY_PATH=./tiktoken-c/target/release:$DYLD_LIBRARY_PATH  # macOS
+crystal build your_program.cr
+
+# Or use --link-flags
+crystal build your_program.cr --link-flags &quot;-L $(pwd)/tiktoken-c/target/release&quot;</code></pre>
+<p>Add to <code>shard.yml</code>:</p>
+<pre><code class="language-yaml">dependencies:
+  tiktoken:
+    github: kojix2/tiktoken-cr</code></pre>
 <h2><a id="usage" class="anchor" href="#usage">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
 </a>Usage</h2>
-<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;../src/tiktoken&quot;</span>
+<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
 
 text <span class="o">=</span> <span class="s">&quot;吾輩は猫である。名前はたぬき。&quot;</span>
 
