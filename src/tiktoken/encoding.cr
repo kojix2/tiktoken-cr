@@ -55,18 +55,6 @@ module Tiktoken
       String.new(str_ptr)
     end
 
-    private def cast_to_sizet(n)
-      {% if LibC::SizeT == UInt128 %}
-        n.to_u128
-      {% elsif LibC::SizeT == UInt64 %}
-        n.to_u64
-      {% elsif LibC::SizeT == UInt32 %}
-        n.to_u32
-      {% else %}
-        raise "Unsupported size_t : #{LibC::SizeT}"
-      {% end %}
-    end
-
     def finalize
       Tiktoken::LibTiktoken.tiktoken_destroy_corebpe(@corebpe)
     end
