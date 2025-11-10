@@ -107,6 +107,54 @@ describe "Tiktoken::Encoding" do
       e = Tiktoken::Encoding.o200k_harmony
       e.should be_a(Tiktoken::Encoding)
     end
+
+    it "should encode and decode with r50k_base" do
+      e = Tiktoken::Encoding.r50k_base
+      text = "Hello world"
+      tokens = e.encode(text)
+      decoded = e.decode(tokens)
+      decoded.should eq text
+    end
+
+    it "should encode and decode with o200k_harmony" do
+      e = Tiktoken::Encoding.o200k_harmony
+      text = "Hello world 吾輩は猫である"
+      tokens = e.encode(text)
+      decoded = e.decode(tokens)
+      decoded.should eq text
+    end
+  end
+
+  describe "memory management" do
+    it "should properly free memory after encoding" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      # This test ensures no memory leak by calling encode multiple times
+      100.times do
+        tokens = e.encode_ordinary("Hello world")
+        tokens.should be_a(Array(UInt32))
+      end
+    end
+
+    it "should properly free memory after decoding" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      # This test ensures no memory leak by calling decode multiple times
+      100.times do
+        text = e.decode([9906, 1917])
+        text.should eq "Hello world"
+      end
+    end
+
+    it "should handle empty string encoding" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      tokens = e.encode_ordinary("")
+      tokens.should eq [] of UInt32
+    end
+
+    it "should handle empty array decoding" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      text = e.decode([] of UInt32)
+      text.should eq ""
+    end
   end
 
   it "should encode and decode the text" do

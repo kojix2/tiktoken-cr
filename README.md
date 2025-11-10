@@ -33,6 +33,8 @@ dependencies:
 
 ## Usage
 
+### Using model name
+
 ```crystal
 require "tiktoken"
 
@@ -46,7 +48,27 @@ encoding.decode(tokens)
 # "吾輩は猫である。名前はたぬき。"
 ```
 
-Count the number of ChatGPT tokens
+### Using encoding directly
+
+You can also create encodings directly:
+
+```crystal
+require "tiktoken"
+
+# Available encodings:
+encoding = Tiktoken::Encoding.r50k_base       # GPT-3 models
+encoding = Tiktoken::Encoding.p50k_base       # Code models
+encoding = Tiktoken::Encoding.p50k_edit       # Edit models
+encoding = Tiktoken::Encoding.cl100k_base     # ChatGPT models
+encoding = Tiktoken::Encoding.o200k_base      # GPT-4o, o1, o3 models
+encoding = Tiktoken::Encoding.o200k_harmony   # gpt-oss models
+
+text = "Hello, world!"
+tokens = encoding.encode(text)
+decoded = encoding.decode(tokens)
+```
+
+### Count the number of ChatGPT tokens
 
 ```crystal
 model = "gpt-4"

@@ -43,7 +43,11 @@ module Tiktoken
     def encode_ordinary(text : String)
       num_tokens = Pointer(LibC::SizeT).malloc(1)
       tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_ordinary(@corebpe, text, num_tokens)
-      raise EncodeError.new("Failed to encode") if tokens.null?
+      # When encoding results in 0 tokens, the returned pointer may be NULL
+      if tokens.null?
+        return [] of UInt32 if num_tokens[0] == 0
+        raise EncodeError.new("Failed to encode")
+      end
       result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
       Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
       result
@@ -60,7 +64,11 @@ module Tiktoken
       end
       num_tokens = Pointer(LibC::SizeT).malloc(1)
       tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode(@corebpe, text, allowed_special_ptr, allowed_special_len, num_tokens)
-      raise EncodeError.new("Failed to encode") if tokens.null?
+      # When encoding results in 0 tokens, the returned pointer may be NULL
+      if tokens.null?
+        return [] of UInt32 if num_tokens[0] == 0
+        raise EncodeError.new("Failed to encode")
+      end
       result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
       Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
       result
@@ -69,7 +77,11 @@ module Tiktoken
     def encode_with_special_tokens(text : String)
       num_tokens = Pointer(LibC::SizeT).malloc(1)
       tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_with_special_tokens(@corebpe, text, num_tokens)
-      raise EncodeError.new("Failed to encode") if tokens.null?
+      # When encoding results in 0 tokens, the returned pointer may be NULL
+      if tokens.null?
+        return [] of UInt32 if num_tokens[0] == 0
+        raise EncodeError.new("Failed to encode")
+      end
       result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
       Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
       result
@@ -81,7 +93,11 @@ module Tiktoken
         tokens[i].to_u32
       end
       str_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode(@corebpe, tokens_ptr, num_tokens)
-      raise DecodeError.new("Failed to decode") if str_ptr.null?
+      # When decoding results in empty string, the returned pointer may be NULL
+      if str_ptr.null?
+        return "" if num_tokens == 0
+        raise DecodeError.new("Failed to decode")
+      end
       result = String.new(str_ptr)
       Tiktoken::LibTiktoken.tiktoken_free(str_ptr.as(Void*))
       result
