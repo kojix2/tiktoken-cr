@@ -129,6 +129,11 @@ crystal build your_program.cr --link-flags &quot;-L $(pwd)/tiktoken-c/target/rel
     <use href="#octicon-link"/>
   </svg>
 </a>Usage</h2>
+<h3><a id="using-model-name" class="anchor" href="#using-model-name">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Using model name</h3>
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
 
 text <span class="o">=</span> <span class="s">&quot;吾輩は猫である。名前はたぬき。&quot;</span>
@@ -139,7 +144,30 @@ tokens <span class="o">=</span> encoding.encode_with_special_tokens(text)
 
 encoding.decode(tokens)
 <span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span></code></pre>
-<p>Count the number of ChatGPT tokens</p>
+<h3><a id="using-encoding-directly" class="anchor" href="#using-encoding-directly">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Using encoding directly</h3>
+<p>You can also create encodings directly:</p>
+<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
+
+<span class="c"># Available encodings:</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.r50k_base       <span class="c"># GPT-3 models</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.p50k_base       <span class="c"># Code models</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.p50k_edit       <span class="c"># Edit models</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.cl100k_base     <span class="c"># ChatGPT models</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.o200k_base      <span class="c"># GPT-4o, o1, o3 models</span>
+encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.o200k_harmony   <span class="c"># gpt-oss models</span>
+
+text <span class="o">=</span> <span class="s">&quot;Hello, world!&quot;</span>
+tokens <span class="o">=</span> encoding.encode(text)
+decoded <span class="o">=</span> encoding.decode(tokens)</code></pre>
+<h3><a id="count-the-number-of-chat-gpt-tokens" class="anchor" href="#count-the-number-of-chat-gpt-tokens">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Count the number of ChatGPT tokens</h3>
 <pre><code class="language-crystal">model <span class="o">=</span> <span class="s">&quot;gpt-4&quot;</span>
 messages <span class="o">=</span> [
   {
