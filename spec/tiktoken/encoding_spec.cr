@@ -77,6 +77,38 @@ describe "Tiktoken::Encoding" do
     end
   end
 
+  describe "encoding factories" do
+    it "should create r50k_base encoding" do
+      e = Tiktoken::Encoding.r50k_base
+      e.should be_a(Tiktoken::Encoding)
+    end
+
+    it "should create p50k_base encoding" do
+      e = Tiktoken::Encoding.p50k_base
+      e.should be_a(Tiktoken::Encoding)
+    end
+
+    it "should create p50k_edit encoding" do
+      e = Tiktoken::Encoding.p50k_edit
+      e.should be_a(Tiktoken::Encoding)
+    end
+
+    it "should create cl100k_base encoding" do
+      e = Tiktoken::Encoding.cl100k_base
+      e.should be_a(Tiktoken::Encoding)
+    end
+
+    it "should create o200k_base encoding" do
+      e = Tiktoken::Encoding.o200k_base
+      e.should be_a(Tiktoken::Encoding)
+    end
+
+    it "should create o200k_harmony encoding" do
+      e = Tiktoken::Encoding.o200k_harmony
+      e.should be_a(Tiktoken::Encoding)
+    end
+  end
+
   it "should encode and decode the text" do
     e = Tiktoken::Encoding.for_model("gpt-4")
     text = "吾輩は猫である。名前はたぬき。"
