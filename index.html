@@ -143,7 +143,13 @@ tokens <span class="o">=</span> encoding.encode_with_special_tokens(text)
 <span class="c"># [7305, 122, 164, 120, 102, 15682, 163, 234, 104, 16556, 30591, 30369, 1811, 13372, 25580, 15682, 28713, 2243, 105, 50834, 1811]</span>
 
 encoding.decode(tokens)
-<span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span></code></pre>
+<span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span>
+
+encoding.count(text)
+<span class="c"># 21</span>
+
+encoding.decode_bytes(tokens)
+<span class="c"># Bytes[229, 144, ...]</span></code></pre>
 <h3><a id="using-encoding-directly" class="anchor" href="#using-encoding-directly">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
@@ -163,6 +169,23 @@ encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t"
 text <span class="o">=</span> <span class="s">&quot;Hello, world!&quot;</span>
 tokens <span class="o">=</span> encoding.encode(text)
 decoded <span class="o">=</span> encoding.decode(tokens)</code></pre>
+<h3><a id="counting-tokens-without-allocating-token-arrays" class="anchor" href="#counting-tokens-without-allocating-token-arrays">
+  <svg class="octicon-link" aria-hidden="true">
+    <use href="#octicon-link"/>
+  </svg>
+</a>Counting tokens without allocating token arrays</h3>
+<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
+
+encoding <span class="o">=</span> <span class="t">Tiktoken</span>.encoding_for_model(<span class="s">&quot;gpt-4&quot;</span>)
+
+encoding.count_ordinary(<span class="s">&quot;Hello world&quot;</span>)
+<span class="c"># 2</span>
+
+encoding.count(<span class="s">&quot;Hello world &lt;|endoftext|&gt;&quot;</span>, allowed_special: <span class="t">Set</span>{<span class="s">&quot;&lt;|endoftext|&gt;&quot;</span>})
+<span class="c"># 4</span>
+
+encoding.count_with_special_tokens(<span class="s">&quot;Hello world &lt;|endoftext|&gt;&quot;</span>)
+<span class="c"># 4</span></code></pre>
 <h3><a id="count-the-number-of-chat-gpt-tokens" class="anchor" href="#count-the-number-of-chat-gpt-tokens">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
@@ -189,6 +212,25 @@ messages <span class="o">=</span> [
 
 <span class="t">Tiktoken</span>.chat_completion_max_tokens(model, messages)
 <span class="c"># 8156</span></code></pre>
+<p>Supported chat message keys are <code>role</code>, <code>content</code>, <code>name</code>, <code>function_call</code>, <code>tool_calls</code>, and <code>refusal</code>.</p>
+<pre><code class="language-crystal">messages <span class="o">=</span> [
+  {
+    <span class="s">&quot;role&quot;</span>       <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
+    <span class="s">&quot;content&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;I&#39;ll call the weather tool.&quot;</span>,
+    <span class="s">&quot;tool_calls&quot;</span> <span class="o">=&gt;</span> [
+      {
+        <span class="s">&quot;name&quot;</span>      <span class="o">=&gt;</span> <span class="s">&quot;get_weather&quot;</span>,
+        <span class="s">&quot;arguments&quot;</span> <span class="o">=&gt;</span> <span class="s">%({&quot;location&quot;:&quot;Tokyo&quot;})</span>,
+      },
+    ],
+  },
+  {
+    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
+    <span class="s">&quot;refusal&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;I cannot help with that request.&quot;</span>,
+  },
+]
+
+<span class="t">Tiktoken</span>.num_tokens_from_messages(<span class="s">&quot;gpt-4o&quot;</span>, messages)</code></pre>
 <h2><a id="documentation" class="anchor" href="#documentation">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>

@@ -133,7 +133,7 @@
   </h2>
   
     
-      <a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L4" target="_blank">
+      <a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L4" target="_blank">
         tiktoken/encoding.cr
       </a>
     
@@ -209,7 +209,27 @@
   <ul class="list-summary">
     
       <li class="entry-summary">
+        <a href="#count%28text%3AString%2Callowed_special%3ASet%28String%29%3DSet%28String%29.new%29%3AInt32-instance-method" class="signature"><strong>#count</strong>(text : String, allowed_special : Set(String) = <span class="t">Set</span>(<span class="t">String</span>).new) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_ordinary%28text%3AString%29%3AInt32-instance-method" class="signature"><strong>#count_ordinary</strong>(text : String) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#count_with_special_tokens%28text%3AString%29%3AInt32-instance-method" class="signature"><strong>#count_with_special_tokens</strong>(text : String) : Int32</a>
+        
+      </li>
+    
+      <li class="entry-summary">
         <a href="#decode%28tokens%29%3AString-instance-method" class="signature"><strong>#decode</strong>(tokens) : String</a>
+        
+      </li>
+    
+      <li class="entry-summary">
+        <a href="#decode_bytes%28tokens%29%3ABytes-instance-method" class="signature"><strong>#decode_bytes</strong>(tokens) : Bytes</a>
         
       </li>
     
@@ -290,7 +310,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L31" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L40" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -306,7 +326,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L13" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L22" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -322,7 +342,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L35" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L44" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -338,7 +358,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L39" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L48" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -354,7 +374,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L23" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L32" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -370,7 +390,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L27" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L36" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -386,7 +406,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L19" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L28" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -405,6 +425,54 @@
     Instance Method Detail
   </h2>
   
+    <div class="entry-detail" id="count(text:String,allowed_special:Set(String)=Set(String).new):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>count</strong>(text : String, allowed_special : Set(String) = <span class="t">Set</span>(<span class="t">String</span>).new) : Int32
+
+        <a class="method-permalink" href="#count%28text%3AString%2Callowed_special%3ASet%28String%29%3DSet%28String%29.new%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L77" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_ordinary(text:String):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>count_ordinary</strong>(text : String) : Int32
+
+        <a class="method-permalink" href="#count_ordinary%28text%3AString%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L72" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="count_with_special_tokens(text:String):Int32-instance-method">
+      <div class="signature">
+        
+        def <strong>count_with_special_tokens</strong>(text : String) : Int32
+
+        <a class="method-permalink" href="#count_with_special_tokens%28text%3AString%29%3AInt32-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L84" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
     <div class="entry-detail" id="decode(tokens):String-instance-method">
       <div class="signature">
         
@@ -416,7 +484,23 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L90" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L89" target="_blank">View source</a>]
+        
+      </div>
+    </div>
+  
+    <div class="entry-detail" id="decode_bytes(tokens):Bytes-instance-method">
+      <div class="signature">
+        
+        def <strong>decode_bytes</strong>(tokens) : Bytes
+
+        <a class="method-permalink" href="#decode_bytes%28tokens%29%3ABytes-instance-method">#</a>
+      </div>
+      
+      <br/>
+      <div>
+        
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L103" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -432,7 +516,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L56" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L58" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -448,7 +532,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L43" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L52" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -464,7 +548,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L77" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L66" target="_blank">View source</a>]
         
       </div>
     </div>
@@ -480,7 +564,7 @@
       <br/>
       <div>
         
-          [<a href="https://github.com/kojix2/tiktoken-cr/blob/b485f8e35eafdb26c24a894c4c2b769d6b525926/src/tiktoken/encoding.cr#L106" target="_blank">View source</a>]
+          [<a href="https://github.com/kojix2/tiktoken-cr/blob/ca58f375cd42af320e832f10ec7cbdfc4efbb08e/src/tiktoken/encoding.cr#L119" target="_blank">View source</a>]
         
       </div>
     </div>
