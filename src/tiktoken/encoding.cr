@@ -6,6 +6,15 @@ module Tiktoken
 
     class DecodeError < Exception; end
 
+    private struct AllowedSpecialArg
+      getter values : Array(String)
+      getter pointers : Pointer(Pointer(LibC::Char))
+      getter length : LibC::SizeT
+
+      def initialize(@values : Array(String), @pointers : Pointer(Pointer(LibC::Char)), @length : LibC::SizeT)
+      end
+    end
+
     private def initialize(corebpe : Pointer(Tiktoken::LibTiktoken::CoreBPE))
       @corebpe = corebpe
     end
@@ -41,61 +50,49 @@ module Tiktoken
     end
 
     def encode_ordinary(text : String)
-      num_tokens = Pointer(LibC::SizeT).malloc(1)
+      num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
       tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_ordinary(@corebpe, text, num_tokens)
-      # When encoding results in 0 tokens, the returned pointer may be NULL
-      if tokens.null?
-        return [] of UInt32 if num_tokens[0] == 0
-        raise EncodeError.new("Failed to encode")
-      end
-      result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
-      Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
-      result
+      tokens_to_a(tokens, num_tokens[0])
     end
 
     def encode(text : String, allowed_special : Set(String) = Set(String).new)
-      allowed_special_len = allowed_special.size
-      allowed_special_ptr = Pointer(Pointer(LibC::Char)).malloc(allowed_special_len)
-      allowed_special.each_with_index do |special, i|
-        allowed_special_ptr[i] = Pointer(LibC::Char).malloc(special.bytesize + 1)
-        special.bytes.each_with_index do |byte, j|
-          allowed_special_ptr[i][j] = byte
-        end
+      with_allowed_special(allowed_special) do |arg|
+        num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
+        tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode(@corebpe, text, arg.pointers, arg.length, num_tokens)
+        tokens_to_a(tokens, num_tokens[0])
       end
-      num_tokens = Pointer(LibC::SizeT).malloc(1)
-      tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode(@corebpe, text, allowed_special_ptr, allowed_special_len, num_tokens)
-      # When encoding results in 0 tokens, the returned pointer may be NULL
-      if tokens.null?
-        return [] of UInt32 if num_tokens[0] == 0
-        raise EncodeError.new("Failed to encode")
-      end
-      result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
-      Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
-      result
     end
 
     def encode_with_special_tokens(text : String)
-      num_tokens = Pointer(LibC::SizeT).malloc(1)
+      num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
       tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_with_special_tokens(@corebpe, text, num_tokens)
-      # When encoding results in 0 tokens, the returned pointer may be NULL
-      if tokens.null?
-        return [] of UInt32 if num_tokens[0] == 0
-        raise EncodeError.new("Failed to encode")
+      tokens_to_a(tokens, num_tokens[0])
+    end
+
+    def count_ordinary(text : String) : Int32
+      count = Tiktoken::LibTiktoken.tiktoken_corebpe_count_ordinary(@corebpe, text)
+      check_count_result(count, "Failed to count tokens")
+    end
+
+    def count(text : String, allowed_special : Set(String) = Set(String).new) : Int32
+      with_allowed_special(allowed_special) do |arg|
+        count = Tiktoken::LibTiktoken.tiktoken_corebpe_count(@corebpe, text, arg.pointers, arg.length)
+        check_count_result(count, "Failed to count tokens")
       end
-      result = Array.new(num_tokens[0]) { |i| tokens[i].to_u32 }
-      Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
-      result
+    end
+
+    def count_with_special_tokens(text : String) : Int32
+      count = Tiktoken::LibTiktoken.tiktoken_corebpe_count_with_special_tokens(@corebpe, text)
+      check_count_result(count, "Failed to count tokens")
     end
 
     def decode(tokens) : String
       num_tokens = tokens.size
-      tokens_ptr = Slice(LibTiktoken::Rank).new(num_tokens) do |i|
-        tokens[i].to_u32
-      end
-      str_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode(@corebpe, tokens_ptr, num_tokens)
-      # When decoding results in empty string, the returned pointer may be NULL
+      return "" if num_tokens == 0
+
+      token_slice = token_slice(tokens)
+      str_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode(@corebpe, token_slice.to_unsafe, num_tokens)
       if str_ptr.null?
-        return "" if num_tokens == 0
         raise DecodeError.new("Failed to decode")
       end
       result = String.new(str_ptr)
@@ -103,8 +100,55 @@ module Tiktoken
       result
     end
 
+    def decode_bytes(tokens) : Bytes
+      num_tokens = tokens.size
+      return Bytes.empty if num_tokens == 0
+
+      token_slice = token_slice(tokens)
+      num_bytes = Pointer(LibC::SizeT).malloc(1, 0)
+      bytes_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode_bytes(@corebpe, token_slice.to_unsafe, num_tokens, num_bytes)
+      if bytes_ptr.null?
+        raise DecodeError.new("Failed to decode bytes")
+      end
+
+      result = Bytes.new(num_bytes[0].to_i) { |i| bytes_ptr[i] }
+      Tiktoken::LibTiktoken.tiktoken_free(bytes_ptr.as(Void*))
+      result
+    end
+
     def finalize
       Tiktoken::LibTiktoken.tiktoken_destroy_corebpe(@corebpe)
+    end
+
+    private def token_slice(tokens)
+      Slice(LibTiktoken::Rank).new(tokens.size) do |i|
+        tokens[i].to_u32
+      end
+    end
+
+    private def tokens_to_a(tokens : Pointer(LibTiktoken::Rank), num_tokens : LibC::SizeT) : Array(UInt32)
+      if tokens.null?
+        return [] of UInt32 if num_tokens == 0
+        raise EncodeError.new("Failed to encode")
+      end
+
+      result = Array.new(num_tokens) { |i| tokens[i].to_u32 }
+      Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
+      result
+    end
+
+    private def check_count_result(count : LibC::SizeT, message : String) : Int32
+      raise EncodeError.new(message) if count == LibC::SizeT::MAX
+      count.to_i
+    end
+
+    private def with_allowed_special(allowed_special : Set(String), &)
+      values = allowed_special.to_a
+      pointers = Pointer(Pointer(LibC::Char)).malloc(Math.max(values.size, 1), Pointer(LibC::Char).null)
+      values.each_with_index do |value, index|
+        pointers[index] = value.to_unsafe
+      end
+      yield AllowedSpecialArg.new(values, pointers, values.size.to_u64)
     end
   end
 end

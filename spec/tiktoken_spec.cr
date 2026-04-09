@@ -30,6 +30,25 @@ describe Tiktoken do
     end
   end
 
+  describe "extended message fields" do
+    it "counts messages with tool calls and refusal" do
+      extended_messages = [
+        {
+          "role"       => "assistant",
+          "content"    => "I'll call the weather tool.",
+          "tool_calls" => [{"name" => "get_weather", "arguments" => %({"location":"Tokyo"})}],
+        },
+        {
+          "role"    => "assistant",
+          "refusal" => "I cannot help with that request.",
+        },
+      ]
+
+      Tiktoken.num_tokens_from_messages("gpt-4o", extended_messages).should be > 0
+      Tiktoken.chat_completion_max_tokens("gpt-4o", extended_messages).should be > 0
+    end
+  end
+
   describe "#VERSION" do
     it "has a version number" do
       Tiktoken::VERSION.should be_a(String)

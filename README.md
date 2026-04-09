@@ -46,6 +46,12 @@ tokens = encoding.encode_with_special_tokens(text)
 
 encoding.decode(tokens)
 # "吾輩は猫である。名前はたぬき。"
+
+encoding.count(text)
+# 21
+
+encoding.decode_bytes(tokens)
+# Bytes[229, 144, ...]
 ```
 
 ### Using encoding directly
@@ -66,6 +72,23 @@ encoding = Tiktoken::Encoding.o200k_harmony   # gpt-oss models
 text = "Hello, world!"
 tokens = encoding.encode(text)
 decoded = encoding.decode(tokens)
+```
+
+### Counting tokens without allocating token arrays
+
+```crystal
+require "tiktoken"
+
+encoding = Tiktoken.encoding_for_model("gpt-4")
+
+encoding.count_ordinary("Hello world")
+# 2
+
+encoding.count("Hello world <|endoftext|>", allowed_special: Set{"<|endoftext|>"})
+# 4
+
+encoding.count_with_special_tokens("Hello world <|endoftext|>")
+# 4
 ```
 
 ### Count the number of ChatGPT tokens
@@ -92,6 +115,29 @@ Tiktoken.num_tokens_from_messages(model, messages)
 
 Tiktoken.chat_completion_max_tokens(model, messages)
 # 8156
+```
+
+Supported chat message keys are `role`, `content`, `name`, `function_call`, `tool_calls`, and `refusal`.
+
+```crystal
+messages = [
+  {
+    "role"       => "assistant",
+    "content"    => "I'll call the weather tool.",
+    "tool_calls" => [
+      {
+        "name"      => "get_weather",
+        "arguments" => %({"location":"Tokyo"}),
+      },
+    ],
+  },
+  {
+    "role"    => "assistant",
+    "refusal" => "I cannot help with that request.",
+  },
+]
+
+Tiktoken.num_tokens_from_messages("gpt-4o", messages)
 ```
 
 ## Documentation

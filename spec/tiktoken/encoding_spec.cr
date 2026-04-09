@@ -57,6 +57,23 @@ describe "Tiktoken::Encoding" do
     end
   end
 
+  describe "counting APIs" do
+    it "counts ordinary tokens" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      e.count_ordinary("Hello world").should eq 2
+    end
+
+    it "counts tokens with allowed special values" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      e.count("Hello world <|endoftext|>", allowed_special: Set{"<|endoftext|>"}).should eq 4
+    end
+
+    it "counts tokens with special token handling enabled" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      e.count_with_special_tokens("Hello world <|endoftext|>").should eq 4
+    end
+  end
+
   describe "#decode" do
     it "should decode the tokens" do
       e = Tiktoken::Encoding.for_model("gpt-4")
@@ -74,6 +91,13 @@ describe "Tiktoken::Encoding" do
       e = Tiktoken::Encoding.for_model("gpt-4")
       text = e.decode([9906, 1917, 83739, 8862, 728, 428, 91, 29])
       text.should eq "Hello world <|endoftext|>"
+    end
+  end
+
+  describe "#decode_bytes" do
+    it "should decode bytes" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      e.decode_bytes([9906, 1917]).should eq "Hello world".to_slice
     end
   end
 
@@ -154,6 +178,11 @@ describe "Tiktoken::Encoding" do
       e = Tiktoken::Encoding.for_model("gpt-4")
       text = e.decode([] of UInt32)
       text.should eq ""
+    end
+
+    it "should handle empty array decode_bytes" do
+      e = Tiktoken::Encoding.for_model("gpt-4")
+      e.decode_bytes([] of UInt32).should eq Bytes.empty
     end
   end
 
