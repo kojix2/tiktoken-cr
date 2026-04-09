@@ -13,16 +13,16 @@ module Tiktoken
 
   def self.num_tokens_from_messages(model, messages)
     with_chat_messages(messages) do |message_pointers|
-      LibTiktoken.tiktoken_num_tokens_from_messages(model, message_pointers.size, message_pointers.to_unsafe).tap do |n|
-        raise "Error in num_tokens_from_messages" if n == LibC::SizeT::MAX
+      LibTiktoken.tiktoken_num_tokens_from_messages(model, message_pointers.size, message_pointers.to_unsafe).tap do |count|
+        raise "Error in num_tokens_from_messages" if count == LibC::SizeT::MAX
       end
     end
   end
 
   def self.chat_completion_max_tokens(model, messages)
     with_chat_messages(messages) do |message_pointers|
-      LibTiktoken.tiktoken_get_chat_completion_max_tokens(model, message_pointers.size, message_pointers.to_unsafe).tap do |n|
-        raise "Error in chat_completion_max_tokens" if n == LibC::SizeT::MAX
+      LibTiktoken.tiktoken_get_chat_completion_max_tokens(model, message_pointers.size, message_pointers.to_unsafe).tap do |count|
+        raise "Error in chat_completion_max_tokens" if count == LibC::SizeT::MAX
       end
     end
   end
@@ -45,28 +45,27 @@ module Tiktoken
 
   private def self.build_chat_message(message) : Pointer(LibTiktoken::ChatCompletionRequestMessage)
     role = required_string_value(message, "role")
-    pointer = Pointer(LibTiktoken::ChatCompletionRequestMessage).null.as(Pointer(LibTiktoken::ChatCompletionRequestMessage))
     pointer = LibTiktoken.tiktoken_chat_message_new(role)
     raise ArgumentError.new("Failed to create chat message") if pointer.null?
 
-    apply_optional_string(pointer, message, "content") do |ptr, value|
-      LibTiktoken.tiktoken_chat_message_set_content(ptr, value)
-    end
-    apply_optional_string(pointer, message, "name") do |ptr, value|
-      LibTiktoken.tiktoken_chat_message_set_name(ptr, value)
-    end
-    apply_function_call(pointer, message["function_call"]?)
-    apply_tool_calls(pointer, message["tool_calls"]?)
-    apply_optional_string(pointer, message, "refusal") do |ptr, value|
-      LibTiktoken.tiktoken_chat_message_set_refusal(ptr, value)
-    end
+    begin
+      apply_optional_string(pointer, message, "content") do |ptr, value|
+        LibTiktoken.tiktoken_chat_message_set_content(ptr, value)
+      end
+      apply_optional_string(pointer, message, "name") do |ptr, value|
+        LibTiktoken.tiktoken_chat_message_set_name(ptr, value)
+      end
+      apply_function_call(pointer, message["function_call"]?)
+      apply_tool_calls(pointer, message["tool_calls"]?)
+      apply_optional_string(pointer, message, "refusal") do |ptr, value|
+        LibTiktoken.tiktoken_chat_message_set_refusal(ptr, value)
+      end
 
-    pointer
-  rescue ex
-    pointer.try do |value|
-      LibTiktoken.tiktoken_chat_message_destroy(value) unless value.null?
+      pointer
+    rescue ex
+      LibTiktoken.tiktoken_chat_message_destroy(pointer)
+      raise ex
     end
-    raise ex
   end
 
   private def self.apply_optional_string(pointer : Pointer(LibTiktoken::ChatCompletionRequestMessage), message, key : String, & : Pointer(LibTiktoken::ChatCompletionRequestMessage), String -> Bool)
