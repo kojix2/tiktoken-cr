@@ -16,11 +16,13 @@ jobs:
       - uses: crystal-lang/install-crystal@v1
         with:
           crystal: ${{ matrix.crystal }}
-      - name: Install from a consumer project
-        working-directory: spec/integration/consumer
+      - name: Install CLI example
+        working-directory: examples/count_tokens
         run: shards install
-      - name: Run consumer
-        working-directory: spec/integration/consumer
-        run: crystal run src/main.cr
+      - name: Build CLI example
+        working-directory: examples/count_tokens
+        run: shards build count_tokens
+      - name: Install native library for specs
+        run: crystal run scripts/install.cr
       - name: Run specs
         run: crystal spec

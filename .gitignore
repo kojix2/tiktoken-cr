@@ -1,3 +1,4 @@
 *.lock
 vendor/
-spec/integration/consumer/lib/
+examples/count_tokens/bin/
+examples/count_tokens/lib/

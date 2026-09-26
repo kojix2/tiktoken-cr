@@ -1,0 +1,11 @@
+name: count_tokens
+version: 0.1.0
+
+dependencies:
+  tiktoken:
+    github: "kojix2/tiktoken-cr"
+    branch: main
+
+targets:
+  count_tokens:
+    main: src/count_tokens.cr

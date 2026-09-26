@@ -1,6 +1,0 @@
-name: tiktoken-consumer
-version: 0.1.0
-
-dependencies:
-  tiktoken:
-    path: ../../..
