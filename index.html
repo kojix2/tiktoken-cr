@@ -98,170 +98,93 @@
     <use href="#octicon-link"/>
   </svg>
 </a>tiktoken-cr</h1>
-<p><a href="https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml"><img src="https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml/badge.svg" alt="test" /></a>
-<a href="https://tokei.kojix2.net/github/kojix2/tiktoken-cr"><img src="https://img.shields.io/endpoint?url=https://tokei.kojix2.net/badge/github/kojix2/tiktoken-cr/lines" alt="Lines of Code" /></a></p>
-<p>Tiktoken for Crystalists.</p>
-<ul>
-<li><a href="https://github.com/kojix2/tiktoken-c">tiktoken-c</a></li>
-</ul>
-<h2><a id="installation" class="anchor" href="#installation">
+<p><a href="https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml"><img src="https://github.com/kojix2/tiktoken-cr/actions/workflows/test.yml/badge.svg" alt="test" /></a></p>
+<p>Token counting and encoding for Crystal, powered by <a href="https://github.com/kojix2/tiktoken-c">tiktoken-c</a>.</p>
+<h2><a id="install" class="anchor" href="#install">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Installation</h2>
-<p>Add tiktoken to your application's <code>shard.yml</code>:</p>
+</a>Install</h2>
+<p>Add the shard to <code>shard.yml</code>:</p>
 <pre><code class="language-yaml">dependencies:
   tiktoken:
     github: kojix2/tiktoken-cr</code></pre>
-<p>Then install the dependencies:</p>
+<p>Then install it:</p>
 <pre><code class="language-sh">shards install</code></pre>
-<p>The postinstall hook downloads the matching tiktoken-c 0.9.1 release archive,
-verifies its pinned SHA-256 digest, and installs its static library inside the
-shard. Applications link that library directly, so no runtime
-<code>LD_LIBRARY_PATH</code>, <code>DYLD_LIBRARY_PATH</code>, or <code>PATH</code> setup is needed.</p>
-<p>Prebuilt libraries are currently available for:</p>
-<p>| Operating system | Architecture |
-| --- | --- |
-| Linux (glibc) | x86_64 |
-| macOS | aarch64 |
-| Windows (MSVC) | x86_64 |</p>
-<p>Other targets are not supported.</p>
-<h2><a id="usage" class="anchor" href="#usage">
+<p>The install step downloads the required native library. No separate Rust or C toolchain is needed.</p>
+<h2><a id="use" class="anchor" href="#use">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Usage</h2>
-<h3><a id="using-model-name" class="anchor" href="#using-model-name">
+</a>Use</h2>
+<h3><a id="count-encode-and-decode" class="anchor" href="#count-encode-and-decode">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Using model name</h3>
+</a>Count, encode, and decode</h3>
 <pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
 
-text <span class="o">=</span> <span class="s">&quot;吾輩は猫である。名前はたぬき。&quot;</span>
-
-encoding <span class="o">=</span> <span class="t">Tiktoken</span>.encoding_for_model(<span class="s">&quot;gpt-4&quot;</span>)
-tokens <span class="o">=</span> encoding.encode_with_special_tokens(text)
-<span class="c"># [7305, 122, 164, 120, 102, 15682, 163, 234, 104, 16556, 30591, 30369, 1811, 13372, 25580, 15682, 28713, 2243, 105, 50834, 1811]</span>
-
-encoding.decode(tokens)
-<span class="c"># &quot;吾輩は猫である。名前はたぬき。&quot;</span>
-
-encoding.count(text)
-<span class="c"># 21</span>
-
-encoding.decode_bytes(tokens)
-<span class="c"># Bytes[229, 144, ...]</span></code></pre>
-<h3><a id="using-encoding-directly" class="anchor" href="#using-encoding-directly">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Using encoding directly</h3>
-<p>You can also create encodings directly:</p>
-<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
-
-<span class="c"># Available encodings:</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.r50k_base       <span class="c"># GPT-3 models</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.p50k_base       <span class="c"># Code models</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.p50k_edit       <span class="c"># Edit models</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.cl100k_base     <span class="c"># ChatGPT models</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.o200k_base      <span class="c"># GPT-4o, o1, o3 models</span>
-encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.o200k_harmony   <span class="c"># gpt-oss models</span>
-
+encoding <span class="o">=</span> <span class="t">Tiktoken</span>.encoding_for_model(<span class="s">&quot;gpt-5.4&quot;</span>)
 text <span class="o">=</span> <span class="s">&quot;Hello, world!&quot;</span>
+
+encoding.count(text)  <span class="c"># =&gt; 4</span>
+
 tokens <span class="o">=</span> encoding.encode(text)
-decoded <span class="o">=</span> encoding.decode(tokens)</code></pre>
-<h3><a id="counting-tokens-without-allocating-token-arrays" class="anchor" href="#counting-tokens-without-allocating-token-arrays">
+encoding.decode(tokens)  <span class="c"># =&gt; &quot;Hello, world!&quot;</span></code></pre>
+<p>To use an encoding directly:</p>
+<pre><code class="language-crystal">encoding <span class="o">=</span> <span class="t">Tiktoken</span><span class="t">::</span><span class="t">Encoding</span>.o200k_base</code></pre>
+<h3><a id="allow-special-tokens" class="anchor" href="#allow-special-tokens">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Counting tokens without allocating token arrays</h3>
-<pre><code class="language-crystal"><span class="k">require</span> <span class="s">&quot;tiktoken&quot;</span>
+</a>Allow special tokens</h3>
+<pre><code class="language-crystal">text <span class="o">=</span> <span class="s">&quot;Hello &lt;|endoftext|&gt;&quot;</span>
+allowed <span class="o">=</span> <span class="t">Set</span>{<span class="s">&quot;&lt;|endoftext|&gt;&quot;</span>}
 
-encoding <span class="o">=</span> <span class="t">Tiktoken</span>.encoding_for_model(<span class="s">&quot;gpt-4&quot;</span>)
-
-encoding.count_ordinary(<span class="s">&quot;Hello world&quot;</span>)
-<span class="c"># 2</span>
-
-encoding.count(<span class="s">&quot;Hello world &lt;|endoftext|&gt;&quot;</span>, allowed_special: <span class="t">Set</span>{<span class="s">&quot;&lt;|endoftext|&gt;&quot;</span>})
-<span class="c"># 4</span>
-
-encoding.count_with_special_tokens(<span class="s">&quot;Hello world &lt;|endoftext|&gt;&quot;</span>)
-<span class="c"># 4</span></code></pre>
-<h3><a id="count-the-number-of-chat-gpt-tokens" class="anchor" href="#count-the-number-of-chat-gpt-tokens">
+encoding.encode(text, allowed_special: allowed)
+encoding.count(text, allowed_special: allowed)</code></pre>
+<h3><a id="count-chat-messages" class="anchor" href="#count-chat-messages">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Count the number of ChatGPT tokens</h3>
-<pre><code class="language-crystal">model <span class="o">=</span> <span class="s">&quot;gpt-4&quot;</span>
-messages <span class="o">=</span> [
-  {
-    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;system&quot;</span>,
-    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;You are a helpful assistant that only speaks French.&quot;</span>,
-  },
-  {
-    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;user&quot;</span>,
-    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;Hello, how are you?&quot;</span>,
-  },
-  {
-    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
-    <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;Parlez-vous francais?&quot;</span>,
-  },
-]
-
-<span class="t">Tiktoken</span>.num_tokens_from_messages(model, messages)
-<span class="c"># 36</span>
-
-<span class="t">Tiktoken</span>.chat_completion_max_tokens(model, messages)
-<span class="c"># 8156</span></code></pre>
-<p>Supported chat message keys are <code>role</code>, <code>content</code>, <code>name</code>, <code>function_call</code>, <code>tool_calls</code>, and <code>refusal</code>.</p>
+</a>Count chat messages</h3>
 <pre><code class="language-crystal">messages <span class="o">=</span> [
-  {
-    <span class="s">&quot;role&quot;</span>       <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
-    <span class="s">&quot;content&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;I&#39;ll call the weather tool.&quot;</span>,
-    <span class="s">&quot;tool_calls&quot;</span> <span class="o">=&gt;</span> [
-      {
-        <span class="s">&quot;name&quot;</span>      <span class="o">=&gt;</span> <span class="s">&quot;get_weather&quot;</span>,
-        <span class="s">&quot;arguments&quot;</span> <span class="o">=&gt;</span> <span class="s">%({&quot;location&quot;:&quot;Tokyo&quot;})</span>,
-      },
-    ],
-  },
-  {
-    <span class="s">&quot;role&quot;</span>    <span class="o">=&gt;</span> <span class="s">&quot;assistant&quot;</span>,
-    <span class="s">&quot;refusal&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;I cannot help with that request.&quot;</span>,
-  },
+  {<span class="s">&quot;role&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;system&quot;</span>, <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;You are a helpful assistant.&quot;</span>},
+  {<span class="s">&quot;role&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;user&quot;</span>, <span class="s">&quot;content&quot;</span> <span class="o">=&gt;</span> <span class="s">&quot;Hello!&quot;</span>},
 ]
 
-<span class="t">Tiktoken</span>.num_tokens_from_messages(<span class="s">&quot;gpt-4o&quot;</span>, messages)</code></pre>
-<h2><a id="documentation" class="anchor" href="#documentation">
+<span class="t">Tiktoken</span>.num_tokens_from_messages(<span class="s">&quot;gpt-5.4&quot;</span>, messages)
+<span class="t">Tiktoken</span>.chat_completion_max_tokens(<span class="s">&quot;gpt-5.4&quot;</span>, messages)</code></pre>
+<p>See the <a href="https://kojix2.github.io/tiktoken-cr/">API documentation</a> for the complete API.</p>
+<h2><a id="command-line-example" class="anchor" href="#command-line-example">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Documentation</h2>
-<p><a href="https://kojix2.github.io/tiktoken-cr/">API Documentation</a></p>
-<h2><a id="contributing" class="anchor" href="#contributing">
+</a>Command-line example</h2>
+<p>The repository includes a small token-counting command:</p>
+<pre><code class="language-sh">cd examples/count_tokens
+shards install
+shards build
+
+echo &quot;Hello, world!&quot; | bin/count_tokens
+bin/count_tokens -m gpt-4o file.txt</code></pre>
+<p>Run <code>bin/count_tokens --help</code> for its options. Without <code>-m</code>, it uses <code>gpt-5.4</code>.</p>
+<h2><a id="supported-platforms" class="anchor" href="#supported-platforms">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>Contributing</h2>
+</a>Supported platforms</h2>
 <ul>
-<li>Report bugs</li>
-<li>Fix bugs and submit pull requests</li>
-<li>Write, clarify, or fix documentation</li>
-<li>Suggest or add new features</li>
-<li>Make a donation</li>
+<li>Linux x86_64 (glibc)</li>
+<li>macOS aarch64</li>
+<li>Windows x86_64 (MSVC)</li>
 </ul>
-<h2><a id="acknowledgement" class="anchor" href="#acknowledgement">
-  <svg class="octicon-link" aria-hidden="true">
-    <use href="#octicon-link"/>
-  </svg>
-</a>Acknowledgement</h2>
-<p>This project is inspired by <a href="https://github.com/IAPark/tiktoken_ruby">tiktoken_ruby</a>.</p>
+<p>Other targets are not currently supported.</p>
 <h2><a id="license" class="anchor" href="#license">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
   </svg>
-</a>LICENSE</h2>
+</a>License</h2>
 <p>MIT</p>
 </div>
 </body>
