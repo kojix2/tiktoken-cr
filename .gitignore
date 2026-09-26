@@ -1,4 +1,3 @@
 *.lock
-tiktoken-c/target
 vendor/
 spec/integration/consumer/lib/

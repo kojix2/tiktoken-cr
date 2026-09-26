@@ -1,3 +1,0 @@
-[submodule "tiktoken-c"]
-	path = tiktoken-c
-	url = https://github.com/kojix2/tiktoken-c
