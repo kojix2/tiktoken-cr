@@ -7,9 +7,6 @@ authors:
 description: |
   Crystal wrapper for TikToken
 
-libraries:
-  tiktoken-c: "0.9.1"
-
 scripts:
   postinstall: crystal run scripts/install.cr
 
