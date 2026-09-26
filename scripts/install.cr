@@ -1,42 +1,32 @@
 require "compress/zip"
 require "digest/sha256"
 require "file_utils"
-require "http/client"
-require "uri"
 
 module TiktokenInstaller
   extend self
 
   VERSION      = "0.9.1"
-  TAG          = "v#{VERSION}"
-  REPOSITORY   = "https://github.com/kojix2/tiktoken-c"
   ROOT         = Path[__DIR__, ".."].expand
   INSTALL_DIR  = ROOT / "vendor" / "tiktoken-c"
   VERSION_FILE = ".tiktoken-c-version"
 
-  record Asset, name : String, sha256 : String
-
   {% if flag?(:linux) && flag?(:x86_64) && !flag?(:musl) %}
-    ASSET = Asset.new(
-      "tiktoken-c-v0.9.1-linux-x86_64.tar.gz",
-      "0b2c5c462602a7e95703e93a6d84222b20172e2d36ff7ece555fd2ff776f9a26"
-    )
+    ARCHIVE_NAME   = "tiktoken-c-v#{VERSION}-linux-x86_64.tar.gz"
+    ARCHIVE_SHA256 = "0b2c5c462602a7e95703e93a6d84222b20172e2d36ff7ece555fd2ff776f9a26"
     STATIC_LIBRARY = "libtiktoken_c.a"
   {% elsif flag?(:darwin) && flag?(:aarch64) %}
-    ASSET = Asset.new(
-      "tiktoken-c-v0.9.1-macos-aarch64.tar.gz",
-      "95b740f55bb63fe49b20dd0305aa9f1046645cc2b5d3c32a82b42aabf8b3fb77"
-    )
+    ARCHIVE_NAME   = "tiktoken-c-v#{VERSION}-macos-aarch64.tar.gz"
+    ARCHIVE_SHA256 = "95b740f55bb63fe49b20dd0305aa9f1046645cc2b5d3c32a82b42aabf8b3fb77"
     STATIC_LIBRARY = "libtiktoken_c.a"
   {% elsif flag?(:win32) && flag?(:x86_64) && !flag?(:gnu) %}
-    ASSET = Asset.new(
-      "tiktoken-c-v0.9.1-windows-x86_64.zip",
-      "c4ee3ae6fad481b31fb19f5f080164858fa373fe0d656d62291a0228609bc16c"
-    )
+    ARCHIVE_NAME   = "tiktoken-c-v#{VERSION}-windows-x86_64.zip"
+    ARCHIVE_SHA256 = "c4ee3ae6fad481b31fb19f5f080164858fa373fe0d656d62291a0228609bc16c"
     STATIC_LIBRARY = "tiktoken_c.lib"
   {% else %}
     {% raise "tiktoken-cr does not provide a native library for this target" %}
   {% end %}
+
+  DOWNLOAD_URL = "https://github.com/kojix2/tiktoken-c/releases/download/v#{VERSION}/#{ARCHIVE_NAME}"
 
   def run
     if installed?
@@ -44,13 +34,12 @@ module TiktokenInstaller
       return
     end
 
-    archive = Path[File.tempname("tiktoken-c-#{VERSION}", File.extname(ASSET.name))]
+    archive = Path[File.tempname("tiktoken-c-#{VERSION}", File.extname(ARCHIVE_NAME))]
     stage = ROOT / "vendor" / ".tiktoken-c-#{Process.pid}"
 
     begin
-      url = "#{REPOSITORY}/releases/download/#{TAG}/#{ASSET.name}"
-      puts "tiktoken: downloading #{url}"
-      download(url, archive)
+      puts "tiktoken: downloading #{DOWNLOAD_URL}"
+      run!("curl", ["-fL", "--retry", "3", "-o", archive.to_s, DOWNLOAD_URL])
       verify(archive)
       extract(archive, stage)
       File.write(stage / VERSION_FILE, VERSION + "\n")
@@ -69,33 +58,11 @@ module TiktokenInstaller
       File.read(INSTALL_DIR / VERSION_FILE).strip == VERSION
   end
 
-  private def download(url : String, destination : Path)
-    current = URI.parse(url)
-    headers = HTTP::Headers{"User-Agent" => "tiktoken-cr/#{VERSION}"}
-
-    6.times do
-      response = HTTP::Client.get(current, headers)
-      if response.status.success?
-        File.write(destination, response.body.to_slice)
-        return
-      end
-
-      if response.status.redirection? && (location = response.headers["Location"]?)
-        current = current.resolve(location)
-        next
-      end
-
-      raise "Download failed with HTTP #{response.status_code}: #{current}"
-    end
-
-    raise "Too many redirects while downloading #{url}"
-  end
-
   private def verify(archive : Path)
-    actual = Digest::SHA256.hexdigest(File.read(archive).to_slice)
-    return if actual == ASSET.sha256
+    actual = Digest::SHA256.new.file(archive.to_s).hexfinal
+    return if actual == ARCHIVE_SHA256
 
-    raise "Checksum mismatch for #{ASSET.name}: expected #{ASSET.sha256}, got #{actual}"
+    raise "Checksum mismatch for #{ARCHIVE_NAME}: expected #{ARCHIVE_SHA256}, got #{actual}"
   end
 
   private def extract(archive : Path, stage : Path)
@@ -103,13 +70,13 @@ module TiktokenInstaller
     FileUtils.rm_rf(stage)
     Dir.mkdir(stage)
 
-    if ASSET.name.ends_with?(".zip")
+    if ARCHIVE_NAME.ends_with?(".zip")
       Compress::Zip::Reader.open(archive) do |zip|
         zip.each_entry do |entry|
           name = entry.filename.gsub("\\", "/").lchop("./")
           next unless {STATIC_LIBRARY, "LICENSE.txt"}.includes?(name)
 
-          File.open(stage / name, "w") { |output| IO.copy(entry.io, output) }
+          File.open(stage / name, "wb") { |output| IO.copy(entry.io, output) }
         end
       end
     else
