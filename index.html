@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Crystal Docs 1.19.1">
+<meta name="generator" content="Crystal Docs 1.20.3">
 <meta name="crystal_docs.project_version" content="main">
 <meta name="crystal_docs.project_name" content="tiktoken">
 
@@ -109,21 +109,23 @@
     <use href="#octicon-link"/>
   </svg>
 </a>Installation</h2>
-<pre><code class="language-bash"># Clone with submodules and build tiktoken-c
-git clone --recursive https://github.com/kojix2/tiktoken-cr
-cd tiktoken-cr &amp;&amp; cd tiktoken-c &amp;&amp; cargo build --release &amp;&amp; cd ..
-
-# Run with library path
-export LD_LIBRARY_PATH=./tiktoken-c/target/release:$LD_LIBRARY_PATH  # Linux
-export DYLD_LIBRARY_PATH=./tiktoken-c/target/release:$DYLD_LIBRARY_PATH  # macOS
-crystal build your_program.cr
-
-# Or use --link-flags
-crystal build your_program.cr --link-flags &quot;-L $(pwd)/tiktoken-c/target/release&quot;</code></pre>
-<p>Add to <code>shard.yml</code>:</p>
+<p>Add tiktoken to your application's <code>shard.yml</code>:</p>
 <pre><code class="language-yaml">dependencies:
   tiktoken:
     github: kojix2/tiktoken-cr</code></pre>
+<p>Then install the dependencies:</p>
+<pre><code class="language-sh">shards install</code></pre>
+<p>The postinstall hook downloads the matching tiktoken-c 0.9.1 release archive,
+verifies its pinned SHA-256 digest, and installs its static library inside the
+shard. Applications link that library directly, so no runtime
+<code>LD_LIBRARY_PATH</code>, <code>DYLD_LIBRARY_PATH</code>, or <code>PATH</code> setup is needed.</p>
+<p>Prebuilt libraries are currently available for:</p>
+<p>| Operating system | Architecture |
+| --- | --- |
+| Linux (glibc) | x86_64 |
+| macOS | aarch64 |
+| Windows (MSVC) | x86_64 |</p>
+<p>Other targets are not supported.</p>
 <h2><a id="usage" class="anchor" href="#usage">
   <svg class="octicon-link" aria-hidden="true">
     <use href="#octicon-link"/>
