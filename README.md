@@ -9,27 +9,34 @@ Tiktoken for Crystalists.
 
 ## Installation
 
-```bash
-# Clone with submodules and build tiktoken-c
-git clone --recursive https://github.com/kojix2/tiktoken-cr
-cd tiktoken-cr && cd tiktoken-c && cargo build --release && cd ..
-
-# Run with library path
-export LD_LIBRARY_PATH=./tiktoken-c/target/release:$LD_LIBRARY_PATH  # Linux
-export DYLD_LIBRARY_PATH=./tiktoken-c/target/release:$DYLD_LIBRARY_PATH  # macOS
-crystal build your_program.cr
-
-# Or use --link-flags
-crystal build your_program.cr --link-flags "-L $(pwd)/tiktoken-c/target/release"
-```
-
-Add to `shard.yml`:
+Add tiktoken to your application's `shard.yml`:
 
 ```yaml
 dependencies:
   tiktoken:
     github: kojix2/tiktoken-cr
 ```
+
+Then install the dependencies:
+
+```sh
+shards install
+```
+
+The postinstall hook downloads the matching tiktoken-c 0.9.1 release archive,
+verifies its pinned SHA-256 digest, and installs its static library inside the
+shard. Applications link that library directly, so no runtime
+`LD_LIBRARY_PATH`, `DYLD_LIBRARY_PATH`, or `PATH` setup is needed.
+
+Prebuilt libraries are currently available for:
+
+| Operating system | Architecture |
+| --- | --- |
+| Linux (glibc) | x86_64 |
+| macOS | aarch64 |
+| Windows (MSVC) | x86_64 |
+
+Other targets are not supported.
 
 ## Usage
 

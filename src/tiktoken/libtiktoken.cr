@@ -1,5 +1,22 @@
 module Tiktoken
-  @[Link("tiktoken_c")]
+  {% if flag?(:win32) %}
+    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/tiktoken_c.lib") %}
+      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
+    {% end %}
+    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/tiktoken_c.lib\" ntdll.lib")]
+  {% elsif flag?(:darwin) %}
+    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a") %}
+      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
+    {% end %}
+    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a\" -liconv -lpthread -lm -lc")]
+  {% elsif flag?(:linux) && !flag?(:musl) %}
+    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a") %}
+      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
+    {% end %}
+    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a\" -lgcc_s -lutil -lrt -lpthread -lm -ldl -lc")]
+  {% else %}
+    {% raise "tiktoken-cr does not support this target." %}
+  {% end %}
   lib LibTiktoken
     alias Rank = UInt32
 

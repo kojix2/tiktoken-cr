@@ -12,7 +12,9 @@ jobs:
       - uses: actions/checkout@v7
       - uses: crystal-lang/install-crystal@v1
       - name: Generate document
-        run: crystal docs
+        run: |
+          crystal run scripts/install.cr
+          crystal docs
       - name: Publish Documentation on GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:

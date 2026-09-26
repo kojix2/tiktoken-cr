@@ -1,32 +1,22 @@
 name: test
+
 on: [push, pull_request]
+
 jobs:
-  build:
-    name: ${{ matrix.os }} Crystal ${{ matrix.crystal }}
+  test:
+    name: ${{ matrix.os }} / Crystal ${{ matrix.crystal }}
     runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
-        os:   [ 'ubuntu', 'macos', 'windows' ]
-        crystal: [ 'latest' ]
+        os: [ubuntu, macos, windows]
+        crystal: [latest]
     steps:
       - uses: actions/checkout@v7
-        with:
-          submodules: recursive
       - uses: crystal-lang/install-crystal@v1
         with:
           crystal: ${{ matrix.crystal }}
-      - if: ${{ matrix.os == 'windows' }}
-        run: |
-          crystal env
-          cd tiktoken-c && cargo build
-          cp target\debug\tiktoken_c.dll.lib D:\a\_temp\crystal-latest-true-undefined\lib\tiktoken_c.lib
-          cp target\debug\tiktoken_c.dll ..
-          cd .. 
-          dir D:\a\_temp\crystal-latest-true-undefined\lib
-          dir 
-          crystal spec
-      - name: Run tests
-        if: ${{ matrix.os != 'windows' }}
-        run: |
-          make test
+      - name: Install native library
+        run: crystal run scripts/install.cr
+      - name: Run specs
+        run: crystal spec
