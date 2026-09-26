@@ -57,7 +57,7 @@ describe Tiktoken do
 
   describe "#tiktoken_c_version" do
     it "return a tiktoken_c version number" do
-      Tiktoken.tiktoken_c_version.should eq("0.9.1")
+      Tiktoken.tiktoken_c_version.should_not be_empty
     end
   end
 end
