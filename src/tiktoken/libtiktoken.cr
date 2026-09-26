@@ -24,7 +24,7 @@ module Tiktoken
     fun tiktoken_o200k_base : CoreBPE*
     fun tiktoken_o200k_harmony : CoreBPE*
     fun tiktoken_destroy_corebpe(corebpe : CoreBPE*)
-    fun tiktoken_get_completion_max_tokens(model : LibC::Char*, prompt : LibC::Char*) : LibC::SizeT
+    fun tiktoken_get_text_completion_max_tokens(model : LibC::Char*, prompt : LibC::Char*) : LibC::SizeT
     fun tiktoken_num_tokens_from_messages(model : LibC::Char*, num_messages : UInt32, messages : ChatCompletionRequestMessage**) : LibC::SizeT
     fun tiktoken_get_chat_completion_max_tokens(model : LibC::Char*, num_messages : UInt32, messages : ChatCompletionRequestMessage**) : LibC::SizeT
     fun tiktoken_get_bpe_from_model(model : LibC::Char*) : CoreBPE*

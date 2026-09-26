@@ -30,28 +30,28 @@ private def build_message(role : String, content : String? = nil, name : String?
 end
 
 describe "Tiktoken::LibTiktoken" do
-  describe "#get_completion_max_tokens" do
+  describe "#get_text_completion_max_tokens" do
     it "returns the maximum number of tokens for a given model" do
-      Tiktoken::LibTiktoken.tiktoken_get_completion_max_tokens("gpt-4", "I am a tanuki.").should eq 8186
+      Tiktoken::LibTiktoken.tiktoken_get_text_completion_max_tokens("gpt-4", "I am a tanuki.").should eq 8186
     end
 
     it "returns the maximum number of tokens for a given model and empty string" do
-      n = Tiktoken::LibTiktoken.tiktoken_get_completion_max_tokens("gpt-4", "")
+      n = Tiktoken::LibTiktoken.tiktoken_get_text_completion_max_tokens("gpt-4", "")
       n.should eq 8192
     end
 
     it "returns LibC::SizeT::MAX if the model is not found" do
-      n = Tiktoken::LibTiktoken.tiktoken_get_completion_max_tokens("cat-dog", "I am a tanuki.")
+      n = Tiktoken::LibTiktoken.tiktoken_get_text_completion_max_tokens("cat-dog", "I am a tanuki.")
       n.should eq LibC::SizeT::MAX
     end
 
     it "returns LibC::SizeT::MAX if the model is nil" do
-      n = Tiktoken::LibTiktoken.tiktoken_get_completion_max_tokens(nil, "I am a tanuki.")
+      n = Tiktoken::LibTiktoken.tiktoken_get_text_completion_max_tokens(nil, "I am a tanuki.")
       n.should eq LibC::SizeT::MAX
     end
 
     it "returns LibC::SizeT::MAX if the prompt is nil" do
-      n = Tiktoken::LibTiktoken.tiktoken_get_completion_max_tokens("gpt-4", nil)
+      n = Tiktoken::LibTiktoken.tiktoken_get_text_completion_max_tokens("gpt-4", nil)
       n.should eq LibC::SizeT::MAX
     end
   end

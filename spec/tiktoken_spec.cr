@@ -57,8 +57,7 @@ describe Tiktoken do
 
   describe "#tiktoken_c_version" do
     it "return a tiktoken_c version number" do
-      v = Tiktoken.tiktoken_c_version
-      v.should be_a(String)
+      Tiktoken.tiktoken_c_version.should eq("0.9.1")
     end
   end
 end
