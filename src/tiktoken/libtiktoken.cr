@@ -1,22 +1,24 @@
 module Tiktoken
-  {% if flag?(:win32) %}
-    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/tiktoken_c.lib") %}
-      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
-    {% end %}
-    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/tiktoken_c.lib\" ntdll.lib")]
+  {% if flag?(:msvc) %}
+    @[Link(ldflags: "/LIBPATH:#{__DIR__}/../../vendor/tiktoken-c")]
+    @[Link("ntdll")]
   {% elsif flag?(:darwin) %}
-    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a") %}
-      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
-    {% end %}
-    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a\" -liconv -lpthread -lm -lc")]
+    @[Link(ldflags: "-L#{__DIR__}/../../vendor/tiktoken-c")]
+    @[Link("iconv")]
+    @[Link("pthread")]
+    @[Link("m")]
+    @[Link("c")]
   {% elsif flag?(:linux) && !flag?(:musl) %}
-    {% unless file_exists?("#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a") %}
-      {% raise "Bundled tiktoken-c is missing. Run `shards install`." %}
-    {% end %}
-    @[Link(ldflags: "\"#{__DIR__}/../../vendor/tiktoken-c/libtiktoken_c.a\" -lgcc_s -lutil -lrt -lpthread -lm -ldl -lc")]
-  {% else %}
-    {% raise "tiktoken-cr does not support this target." %}
+    @[Link(ldflags: "-L#{__DIR__}/../../vendor/tiktoken-c")]
+    @[Link("gcc_s")]
+    @[Link("util")]
+    @[Link("rt")]
+    @[Link("pthread")]
+    @[Link("m")]
+    @[Link("dl")]
+    @[Link("c")]
   {% end %}
+  @[Link("tiktoken_c")]
   lib LibTiktoken
     alias Rank = UInt32
 
