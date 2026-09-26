@@ -20,69 +20,69 @@ module Tiktoken
     end
 
     def self.for_model(model_name : String)
-      corebpe = Tiktoken::LibTiktoken.tiktoken_get_bpe_from_model(model_name)
+      corebpe = Tiktoken::LibTiktoken.get_bpe_from_model(model_name)
       raise "Failed to get BPE from model #{model_name}" if corebpe.null?
       new(corebpe)
     end
 
     def self.r50k_base
-      new(Tiktoken::LibTiktoken.tiktoken_r50k_base)
+      new(Tiktoken::LibTiktoken.r50k_base)
     end
 
     def self.p50k_base
-      new(Tiktoken::LibTiktoken.tiktoken_p50k_base)
+      new(Tiktoken::LibTiktoken.p50k_base)
     end
 
     def self.p50k_edit
-      new(Tiktoken::LibTiktoken.tiktoken_p50k_edit)
+      new(Tiktoken::LibTiktoken.p50k_edit)
     end
 
     def self.cl100k_base
-      new(Tiktoken::LibTiktoken.tiktoken_cl100k_base)
+      new(Tiktoken::LibTiktoken.cl100k_base)
     end
 
     def self.o200k_base
-      new(Tiktoken::LibTiktoken.tiktoken_o200k_base)
+      new(Tiktoken::LibTiktoken.o200k_base)
     end
 
     def self.o200k_harmony
-      new(Tiktoken::LibTiktoken.tiktoken_o200k_harmony)
+      new(Tiktoken::LibTiktoken.o200k_harmony)
     end
 
     def encode_ordinary(text : String)
       num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
-      tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_ordinary(@corebpe, text, num_tokens)
+      tokens = Tiktoken::LibTiktoken.corebpe_encode_ordinary(@corebpe, text, num_tokens)
       tokens_to_a(tokens, num_tokens[0])
     end
 
     def encode(text : String, allowed_special : Set(String) = Set(String).new)
       with_allowed_special(allowed_special) do |arg|
         num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
-        tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode(@corebpe, text, arg.pointers, arg.length, num_tokens)
+        tokens = Tiktoken::LibTiktoken.corebpe_encode(@corebpe, text, arg.pointers, arg.length, num_tokens)
         tokens_to_a(tokens, num_tokens[0])
       end
     end
 
     def encode_with_special_tokens(text : String)
       num_tokens = Pointer(LibC::SizeT).malloc(1, 0)
-      tokens = Tiktoken::LibTiktoken.tiktoken_corebpe_encode_with_special_tokens(@corebpe, text, num_tokens)
+      tokens = Tiktoken::LibTiktoken.corebpe_encode_with_special_tokens(@corebpe, text, num_tokens)
       tokens_to_a(tokens, num_tokens[0])
     end
 
     def count_ordinary(text : String) : Int32
-      count = Tiktoken::LibTiktoken.tiktoken_corebpe_count_ordinary(@corebpe, text)
+      count = Tiktoken::LibTiktoken.corebpe_count_ordinary(@corebpe, text)
       check_count_result(count, "Failed to count tokens")
     end
 
     def count(text : String, allowed_special : Set(String) = Set(String).new) : Int32
       with_allowed_special(allowed_special) do |arg|
-        count = Tiktoken::LibTiktoken.tiktoken_corebpe_count(@corebpe, text, arg.pointers, arg.length)
+        count = Tiktoken::LibTiktoken.corebpe_count(@corebpe, text, arg.pointers, arg.length)
         check_count_result(count, "Failed to count tokens")
       end
     end
 
     def count_with_special_tokens(text : String) : Int32
-      count = Tiktoken::LibTiktoken.tiktoken_corebpe_count_with_special_tokens(@corebpe, text)
+      count = Tiktoken::LibTiktoken.corebpe_count_with_special_tokens(@corebpe, text)
       check_count_result(count, "Failed to count tokens")
     end
 
@@ -91,12 +91,12 @@ module Tiktoken
       return "" if num_tokens == 0
 
       token_slice = token_slice(tokens)
-      str_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode(@corebpe, token_slice.to_unsafe, num_tokens)
+      str_ptr = Tiktoken::LibTiktoken.corebpe_decode(@corebpe, token_slice.to_unsafe, num_tokens)
       if str_ptr.null?
         raise DecodeError.new("Failed to decode")
       end
       result = String.new(str_ptr)
-      Tiktoken::LibTiktoken.tiktoken_free(str_ptr.as(Void*))
+      Tiktoken::LibTiktoken.free(str_ptr.as(Void*))
       result
     end
 
@@ -106,18 +106,18 @@ module Tiktoken
 
       token_slice = token_slice(tokens)
       num_bytes = Pointer(LibC::SizeT).malloc(1, 0)
-      bytes_ptr = Tiktoken::LibTiktoken.tiktoken_corebpe_decode_bytes(@corebpe, token_slice.to_unsafe, num_tokens, num_bytes)
+      bytes_ptr = Tiktoken::LibTiktoken.corebpe_decode_bytes(@corebpe, token_slice.to_unsafe, num_tokens, num_bytes)
       if bytes_ptr.null?
         raise DecodeError.new("Failed to decode bytes")
       end
 
       result = Bytes.new(num_bytes[0].to_i) { |i| bytes_ptr[i] }
-      Tiktoken::LibTiktoken.tiktoken_free(bytes_ptr.as(Void*))
+      Tiktoken::LibTiktoken.free(bytes_ptr.as(Void*))
       result
     end
 
     def finalize
-      Tiktoken::LibTiktoken.tiktoken_destroy_corebpe(@corebpe)
+      Tiktoken::LibTiktoken.destroy_corebpe(@corebpe)
     end
 
     private def token_slice(tokens)
@@ -133,7 +133,7 @@ module Tiktoken
       end
 
       result = Array.new(num_tokens) { |i| tokens[i].to_u32 }
-      Tiktoken::LibTiktoken.tiktoken_free(tokens.as(Void*))
+      Tiktoken::LibTiktoken.free(tokens.as(Void*))
       result
     end
 
